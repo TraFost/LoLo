@@ -21,7 +21,8 @@ LoLo processes player match data through a multi stage system, fetch, feature ex
 - [Riot Games API](https://developer.riotgames.com/docs/lol) real match data.
 - [Data Dragon](https://developer.riotgames.com/docs/lol#data-dragon) champion, item, and ability metadata.
 - [Serverless Framework](https://www.serverless.com/) Lambda deployment automation.
-- Font, [Inter](https://fonts.google.com/specimen/Inter) for UI consistency.
+- [Vite](https://vitejs.dev/) fast frontend build tool.
+- [TypeScript](https://www.typescriptlang.org/) strong typing for both client and server.
 
 ---
 
@@ -71,12 +72,6 @@ shared/
     types/
       index.ts
 ```
-
-**Notes:**
-
-- `agent/` contains the logic that interprets match data and generates advice.
-- `ui/` renders post match summaries and pre match plans.
-- `utils/` manages API calls, JSON caching, and error handling.
 
 ---
 
