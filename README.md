@@ -48,16 +48,14 @@ client/
   tsconfig.json
   tsconfig.node.json
   vite.config.ts
-  public/
-    vite.svg
+  public
   src/
     App.css
     App.tsx
     index.css
     main.tsx
     vite-env.d.ts
-    assets/
-      beaver.svg
+    assets
 server/
   package.json
   README.md
