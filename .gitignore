@@ -39,3 +39,6 @@ pnpm-debug.log*
 
 # Turbo
 .turbo
+
+# Misc
+internal-docs
