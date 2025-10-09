@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import beaver from './assets/beaver.svg'
-import type { ApiResponse } from 'shared'
-import './App.css'
+import { useState } from 'react';
+import beaver from '../public/assets/icon/lolo-main.webp';
+import type { ApiResponse } from 'shared';
+import './App.css';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:3000"
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
 
 function App() {
-  const [data, setData] = useState<ApiResponse | undefined>()
+  const [data, setData] = useState<ApiResponse | undefined>();
 
   async function sendRequest() {
     try {
-      const req = await fetch(`${SERVER_URL}/hello`)
-      const res: ApiResponse = await req.json()
-      setData(res)
+      const req = await fetch(`${SERVER_URL}/hello`);
+      const res: ApiResponse = await req.json();
+      setData(res);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -26,26 +26,26 @@ function App() {
         </a>
       </div>
       <h1>bhvr</h1>
-      <h2>Bun + Hono + Vite + React</h2>
+      <h2>Hono + Vite + React</h2>
       <p>A typesafe fullstack monorepo</p>
       <div className="card">
-        <div className='button-container'>
-          <button onClick={sendRequest}>
-            Call API
-          </button>
-          <a className='docs-link' target='_blank' href="https://bhvr.dev">Docs</a>
+        <div className="button-container">
+          <button onClick={sendRequest}>Call API</button>
+          <a className="docs-link" target="_blank" href="https://bhvr.dev">
+            Docs
+          </a>
         </div>
         {data && (
-          <pre className='response'>
+          <pre className="response">
             <code>
-            Message: {data.message} <br />
-            Success: {data.success.toString()}
+              Message: {data.message} <br />
+              Success: {data.success.toString()}
             </code>
           </pre>
         )}
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
