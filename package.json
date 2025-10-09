@@ -1,36 +1,36 @@
 {
-	"name": "bhvr",
-	"version": "0.5.0",
-	"description": "A monorepo template built with Hono, Vite, and React",
-	"author": "Steve Simkins",
-	"license": "MIT",
-	"homepage": "https://github.com/stevedylandev/bhvr",
-	"packageManager": "pnpm@9.0.0",
-	"scripts": {
-		"dev": "turbo dev",
-		"dev:client": "turbo dev --filter=client",
-		"dev:server": "turbo dev --filter=server",
-		"build": "turbo build",
-		"build:client": "turbo build --filter=client",
-		"build:server": "turbo build --filter=server",
-		"lint": "turbo lint",
-		"type-check": "turbo type-check",
-		"test": "turbo test",
-		"postinstall": "turbo build --filter=shared --filter=server"
-	},
-	"keywords": [
-		"pnpm",
-		"node",
-		"hono",
-		"react",
-		"vite",
-		"monorepo",
-		"turbo"
-	],
-	"devDependencies": {
-		"turbo": "^2.5.5"
-	},
-	"peerDependencies": {
-		"typescript": "^5.7.3"
-	}
+  "name": "lolo",
+  "version": "0.5.0",
+  "description": "LoLo is an AI-powered League of Legends companion that analyzes match data, learns your play style, and gives simple, personal insights to help you improve and play smarter every game.",
+  "author": "Rahman Nurudin",
+  "license": "MIT",
+  "homepage": "https://github.com/stevedylandev/bhvr",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:client": "turbo dev --filter=client",
+    "dev:server": "turbo dev --filter=server",
+    "build": "turbo build",
+    "build:client": "turbo build --filter=client",
+    "build:server": "turbo build --filter=server",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "postinstall": "turbo build --filter=shared --filter=server"
+  },
+  "keywords": [
+    "pnpm",
+    "node",
+    "hono",
+    "react",
+    "vite",
+    "monorepo",
+    "turbo"
+  ],
+  "devDependencies": {
+    "turbo": "^2.5.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.7.3"
+  }
 }
