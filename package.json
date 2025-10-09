@@ -4,7 +4,7 @@
   "description": "LoLo is an AI-powered League of Legends companion that analyzes match data, learns your play style, and gives simple, personal insights to help you improve and play smarter every game.",
   "author": "Rahman Nurudin",
   "license": "MIT",
-  "homepage": "https://github.com/stevedylandev/bhvr",
+  "homepage": "https://github.com/TraFost/LoLo",
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "dev": "turbo dev",

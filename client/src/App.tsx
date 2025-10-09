@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import beaver from '../public/assets/icon/lolo-main.webp';
 import type { ApiResponse } from 'shared';
+
+import mainLogo from '../public/assets/icon/lolo-main.webp';
+
 import './App.css';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
@@ -21,19 +23,14 @@ function App() {
   return (
     <>
       <div>
-        <a href="https://github.com/stevedylandev/bhvr" target="_blank">
-          <img src={beaver} className="logo" alt="beaver logo" />
+        <a href="https://github.com/TraFost/LoLo" target="_blank">
+          <img src={mainLogo} className="logo" alt="LoLo logo" />
         </a>
       </div>
-      <h1>bhvr</h1>
-      <h2>Hono + Vite + React</h2>
-      <p>A typesafe fullstack monorepo</p>
+      <h1>LoLo</h1>
       <div className="card">
         <div className="button-container">
           <button onClick={sendRequest}>Call API</button>
-          <a className="docs-link" target="_blank" href="https://bhvr.dev">
-            Docs
-          </a>
         </div>
         {data && (
           <pre className="response">
