@@ -19,7 +19,7 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
+      "@ui/*": ["./src/ui/*"],
       "@assets/*": ["./public/assets/*"]
     }
   },
