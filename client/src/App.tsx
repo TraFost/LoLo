@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ApiResponse } from 'shared';
 
-import mainLogo from '../public/assets/icon/lolo-main.webp';
+import mainLogo from '@assets/icon/lolo-main.webp';
 
 import './App.css';
 
