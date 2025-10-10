@@ -61,7 +61,7 @@ server/
   README.md
   tsconfig.json
   src/
-    index.ts
+    server.ts
 shared/
   package.json
   tsconfig.json
