@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Sora:wght@100..800&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -65,6 +66,7 @@ body,
 #root {
   height: 100dvh;
   width: 100dvw;
+  overflow-x: hidden;
 }
 
 body {
@@ -74,7 +76,7 @@ body {
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 font-["DM_Sans"];
   }
   body {
     @apply bg-background text-foreground;
