@@ -1,6 +1,6 @@
 import mainLogo from '@assets/icon/lolo-main.webp';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/atoms/button';
 
 // import { useState } from 'react';
 // import type { ApiResponse } from 'shared';
@@ -30,7 +30,7 @@ function App() {
 
       <h1>LoLo</h1>
 
-      <Button>test</Button>
+      <Button className="">test</Button>
     </section>
   );
 }
