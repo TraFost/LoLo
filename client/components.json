@@ -12,11 +12,13 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/components/atoms",
-    "utils": "@/utils",
-    "ui": "@/components/ui",
+    "components": "@/ui/molecules",
+    "utils": "@/lib/utils",
+    "ui": "@/ui/atoms",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "registries": {}
+  "registries": {
+    "@aceternity": "https://ui.aceternity.com/registry/{name}.json"
+  }
 }

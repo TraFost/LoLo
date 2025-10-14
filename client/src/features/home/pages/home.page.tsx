@@ -1,5 +1,21 @@
-type Props = {};
+import { FAQ } from '../components/faq.home';
+import { Features } from '../components/features.home';
+import { Footer } from '../components/footer.home';
+import { Hero } from '../components/hero.home';
+import { SocialProofBar } from '../components/social-proof.home';
 
-export default function HomePage({}: Props) {
-  return <div>home.page</div>;
+import { MainNavbar } from '@/ui/organisms/navbar.organism';
+
+export function HomePage() {
+  return (
+    <>
+      <MainNavbar />
+      <Hero />
+      <SocialProofBar />
+      <Features />
+      <FAQ />
+      {/* <CTASection /> */}
+      <Footer />
+    </>
+  );
 }
