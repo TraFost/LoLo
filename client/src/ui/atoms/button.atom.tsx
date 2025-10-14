@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from '@/lib/utils/cn.utils';
+import { cn } from '@/lib/utils/cn.util';
 
 const buttonVariants = cva(
   'group relative inline-block font-bold uppercase tracking-widest focus:outline-none focus:ring-2 transition-all select-none cursor-pointer',
@@ -16,11 +16,13 @@ const buttonVariants = cva(
         primary: 'text-black [&>span:nth-child(1)]:bg-primary [&>span:nth-child(2)]:border-black',
         secondary: 'text-white [&>span:nth-child(1)]:bg-black [&>span:nth-child(2)]:border-black',
         accent: 'text-black [&>span:nth-child(1)]:bg-white [&>span:nth-child(2)]:border-black',
+        custom: '',
       },
       size: {
         sm: '[&>span:nth-child(2)]:px-5 [&>span:nth-child(2)]:py-2 text-xs',
         default: '[&>span:nth-child(2)]:px-8 [&>span:nth-child(2)]:py-3 text-sm',
         lg: '[&>span:nth-child(2)]:px-10 [&>span:nth-child(2)]:py-4 text-base',
+        icon: 'inline-flex items-center justify-center p-0',
       },
     },
     compoundVariants: [

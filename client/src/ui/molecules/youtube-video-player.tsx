@@ -3,7 +3,7 @@ import { Maximize2, Minimize2, Play } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { cn } from '@/lib/utils/cn.util';
-import { Button } from '@/ui/atoms/button';
+import { Button } from '@/ui/atoms/button.atom';
 
 interface YouTubePlayerProps {
   videoId: string;
@@ -142,8 +142,9 @@ export function YouTubePlayer({
                   className="absolute inset-0 flex flex-col items-center justify-center z-10"
                 >
                   <Button
-                    size="lg"
-                    variant="secondary"
+                    variant="flat"
+                    color="custom"
+                    size="icon"
                     className={cn(
                       'relative h-16 w-16 rounded-full border border-white/70 bg-background/80 backdrop-blur-sm md:h-20 md:w-20 p-0',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -254,8 +255,9 @@ export function YouTubePlayer({
                         className="absolute inset-0 flex flex-col items-center justify-center z-10"
                       >
                         <Button
-                          size="lg"
-                          variant="secondary"
+                          variant="flat"
+                          color="custom"
+                          size="icon"
                           className={cn(
                             'relative h-16 w-16 rounded-full border border-white/70 bg-background/80 backdrop-blur-sm md:h-20 md:w-20 p-0',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -350,7 +352,8 @@ function YouTubePlayerControls({
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
-              variant="secondary"
+              variant="flat"
+              color="custom"
               size="icon"
               onClick={onToggleExpand}
               className={cn(
