@@ -22,3 +22,12 @@ body {
   padding: 0;
   overflow-x: hidden;
 }
+
+.hero-min {
+  min-height: 70svh;
+}
+@media (min-width: 768px) {
+  .hero-min {
+    min-height: 75svh;
+  }
+}
