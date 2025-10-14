@@ -1,6 +1,6 @@
 import { Button } from '@/ui/atoms/button.atom';
 
-export default function CTASection() {
+export function CTASection() {
   return (
     <section className="text-white py-32 px-8 md:px-24 relative overflow-hidden flex flex-col items-center text-center">
       <h2 className="text-5xl md:text-6xl font-extrabold tracking-widest text-primary mb-6">

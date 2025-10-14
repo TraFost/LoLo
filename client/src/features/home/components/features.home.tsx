@@ -64,11 +64,9 @@ export function Features() {
           </div>
         </motion.div>
 
-        {/* Right column also needs a variant */}
         <motion.div
           variants={scaleIn}
-          className="mt-12 lg:mt-0 w-full lg:max-w-xl flex items-center justify-center"
-          style={{ willChange: 'transform, opacity, filter' }}
+          className="mt-12 lg:mt-0 w-full lg:max-w-xl flex items-center"
         >
           <div className="w-full max-w-[720px] lg:min-w-[650px]">
             <YouTubePlayer videoId="dQw4w9WgXcQ" expandButtonClassName="text-white" />
