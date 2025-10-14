@@ -1,6 +1,9 @@
 import { motion, useReducedMotion } from 'motion/react';
-import { createStaggerContainer, fadeIn, fadeInUp, scaleIn } from '@/lib/utils/motion.utils';
+
 import { Button } from '@/ui/atoms/button.atom';
+import { Description } from '@/ui/atoms/typography/description.atom';
+
+import { createStaggerContainer, fadeIn, fadeInUp, scaleIn } from '@/lib/utils/motion.util';
 
 const heroContainer = createStaggerContainer(0.15, 0.12);
 
@@ -14,9 +17,9 @@ export function Hero() {
       initial="hidden"
       animate="visible"
       variants={heroContainer}
-      className="relative overflow-hidden px-4 sm:px-6 lg:px-12 bg-gradient-to-br from-black via-[#0f1028] to-[#05060f] text-white"
+      className="relative overflow-hidden bg-gradient-to-br from-black via-[#0f1028] to-[#05060f] text-white"
     >
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-10 py-20 sm:py-24 md:grid-cols-2 lg:gap-14">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-10 px-4 py-20 sm:px-6 sm:py-24 md:grid-cols-2 lg:gap-14">
         <motion.div
           variants={fadeInUp}
           className="order-2 md:order-1 flex w-full max-w-xl flex-col gap-6"
@@ -28,12 +31,12 @@ export function Hero() {
             Start Learning. Start Winning.
           </motion.h1>
 
-          <motion.p
-            variants={fadeInUp}
-            className="text-base sm:text-lg leading-relaxed text-gray-300 [text-wrap:balance]"
-          >
-            Smarter feedback, less noise. LoLo shows what matters so you can play better next game.
-          </motion.p>
+          <Description
+            className="mt-1 ml-2"
+            tag="p"
+            text="Smarter feedback, less noise. LoLo shows what matters so you can play better next game."
+            animate
+          />
 
           <motion.div variants={fadeInUp} className="mt-2 flex flex-col gap-4 sm:flex-row">
             <motion.div
@@ -80,26 +83,23 @@ export function Hero() {
                   !reduce ? { duration: 6.4, repeat: Infinity, ease: 'easeInOut' } : undefined
                 }
               />
-              <motion.img
-                src="/assets/icon/lolo-main.webp"
-                alt="LoLo icon"
-                className="absolute inset-0 m-auto h-full w-auto max-w-full object-contain"
-                loading="eager"
-                decoding="async"
-                fetchPriority="high"
-                animate={!reduce ? { rotate: [0, 2, -2, 0] } : undefined}
-                transition={
-                  !reduce ? { duration: 8, repeat: Infinity, ease: 'easeInOut' } : undefined
-                }
-              />
-              <motion.div
-                aria-hidden
-                className="absolute -inset-8 -z-20 rounded-[28%] border border-primary/40"
-                animate={!reduce ? { rotate: 360 } : undefined}
-                transition={
-                  !reduce ? { duration: 26, repeat: Infinity, ease: 'linear' } : undefined
-                }
-              />
+
+              <picture className="absolute inset-0 m-auto h-full w-full">
+                <source srcSet="/assets/icon/lolo-main.webp" type="image/webp" />
+                <motion.img
+                  src="/assets/hero/lolo-main.webp"
+                  alt="LoLo icon"
+                  className="h-full w-full object-contain"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                  sizes="(min-width: 1024px) 36rem, (min-width: 768px) 28rem, 70vw"
+                  animate={!reduce ? { rotate: [0, 2, -2, 0] } : undefined}
+                  transition={
+                    !reduce ? { duration: 8, repeat: Infinity, ease: 'easeInOut' } : undefined
+                  }
+                />
+              </picture>
             </div>
           </div>
         </motion.div>

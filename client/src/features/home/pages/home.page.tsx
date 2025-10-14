@@ -1,23 +1,21 @@
-import CTASection from '../components/cta.home';
-import FeaturesSection from '../components/features.home';
-import Footer from '../components/footer.home';
-import Hero from '../components/hero.home';
-import MockupSection from '../components/mockup.home';
-import Navbar from '../components/navbar.home';
+import { FAQ } from '../components/faq.home';
+import { Features } from '../components/features.home';
+import { Footer } from '../components/footer.home';
+import { Hero } from '../components/hero.home';
+import { SocialProofBar } from '../components/social-proof.home';
 
-type Props = {};
+import { MainNavbar } from '@/ui/organisms/navbar.organism';
 
-export default function HomePage({}: Props) {
+export function HomePage() {
   return (
-    <div>
-      <Navbar />
+    <>
+      <MainNavbar />
       <Hero />
-      <FeaturesSection />
-      <div className="bg-gray-950">
-        <MockupSection />
-        <CTASection />
-      </div>
+      <SocialProofBar />
+      <Features />
+      <FAQ />
+      {/* <CTASection /> */}
       <Footer />
-    </div>
+    </>
   );
 }
