@@ -57,7 +57,7 @@ export function MainNavbar() {
             ))}
 
             <div className="flex w-full flex-col gap-4">
-              <Button variant="flat" color="primary" size="lg">
+              <Button variant="flat" color="primary" size="sm" className="font-bold text-white">
                 Get Started
               </Button>
             </div>
