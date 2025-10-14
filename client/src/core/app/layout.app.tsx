@@ -3,7 +3,7 @@ import { AppProviders } from './providers.app';
 
 import '@/index.css';
 
-export default function AppLayout() {
+export function App() {
   return (
     <>
       <AppProviders>
