@@ -1,5 +1,7 @@
 import { createBrowserRouter, RouterProvider, Navigate, type RouteObject } from 'react-router';
 import { HomePage } from '@/features/home/pages/home.page';
+import { AnalyzePage } from '@/features/analyze/pages/analyze.page';
+import { SummarizePage } from '@/features/summarize/page/summarize.page';
 
 export interface Page {
   id: string;
@@ -10,7 +12,8 @@ export interface Page {
 
 export const PAGES: Page[] = [
   { id: 'home', label: 'Home', path: '/home', element: <HomePage /> },
-  { id: 'analyze', label: 'Analyze', path: '/analyze', element: <></> },
+  { id: 'analyze', label: 'Analyze', path: '/analyze', element: <AnalyzePage /> },
+  { id: 'summarize', label: 'Summarize', path: '/summarize', element: <SummarizePage /> },
   { id: 'team', label: 'Team', path: '/team', element: <></> },
 ] as const;
 
