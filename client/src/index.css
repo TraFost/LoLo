@@ -15,6 +15,7 @@ body,
 #root {
   height: 100dvh;
   width: 100dvw;
+  font-family: 'DM Sans', sans-serif;
 }
 
 body {
