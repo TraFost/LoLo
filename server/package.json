@@ -5,7 +5,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/dev.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.4.1",
@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.31",
+    "esbuild": "^0.25.11",
     "tsx": "^4.7.0"
   }
 }
