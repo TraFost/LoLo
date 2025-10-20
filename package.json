@@ -28,6 +28,7 @@
     "turbo"
   ],
   "devDependencies": {
+    "sst": "^3.17.19",
     "turbo": "^2.5.5"
   },
   "peerDependencies": {
