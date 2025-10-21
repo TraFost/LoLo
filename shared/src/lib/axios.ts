@@ -6,6 +6,8 @@ import axios, {
 } from 'axios';
 import qs from 'qs';
 
+export type HttpInstance = AxiosInstance;
+
 type CreateClientOpts = {
   baseURL: string;
   timeoutMs?: number;
