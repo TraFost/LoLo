@@ -1,6 +1,6 @@
-import { ZodError } from 'zod';
 import { HTTPException } from 'hono/http-exception';
 import type { Context } from 'hono';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
 import { StatusCodes } from 'shared/src/http-status';
 import type { ApiResponse, ErrorBody, ResponseWithData } from 'shared/src/types/response';
@@ -12,38 +12,41 @@ export const errorHandler = (err: unknown, c: Context) => {
 
   if (err instanceof HTTPException) {
     const res = err.getResponse();
-    res.headers.set('x-request-id', requestId);
-    return res;
-  }
+    const status = res.status as ContentfulStatusCode;
+    const cause: any = (err as any).cause;
 
-  if (err instanceof ZodError) {
+    if (cause && cause._kind === 'zod') {
+      const body: ErrorBody = {
+        requestId,
+        success: false,
+        message: 'Validation failed',
+        details: cause.issues.map((i: any) => ({
+          path: Array.isArray(i.path) ? i.path.join('.') : '',
+          message: i.message,
+          code: i.code,
+        })),
+      };
+      return c.json(body, { status });
+    }
+
     const body: ErrorBody = {
-      success: false,
-      message: 'Validation failed',
       requestId,
-      details: err.issues.map((i) => ({
-        path: i.path.join('.'),
-        message: i.message,
-        code: i.code,
-      })),
+      success: false,
+      message: err.message || 'Request failed',
+      details: !isProd && cause ? cause : undefined,
     };
-    console.error('[validation]', { requestId, issues: err.issues });
-
-    return c.json(body, { status: StatusCodes.BAD_REQUEST });
+    return c.json(body, { status });
   }
 
   const body: ErrorBody = {
+    requestId,
     success: false,
     message: 'Something went wrong',
-    requestId,
     details:
       !isProd && err instanceof Error
         ? { name: err.name, message: err.message, stack: err.stack }
         : undefined,
   };
-
-  console.error('[unhandled]', { requestId, error: err });
-
   return c.json(body, { status: StatusCodes.INTERNAL_SERVER_ERROR });
 };
 
@@ -52,7 +55,7 @@ export const success = (message = 'OK'): ApiResponse => ({
   success: true,
 });
 
-export const successWithData = <T>(data: T, message = 'OK'): ResponseWithData<T> => ({
+export const successWithData = <T>(message = 'OK', data: T): ResponseWithData<T> => ({
   message,
   success: true,
   data,

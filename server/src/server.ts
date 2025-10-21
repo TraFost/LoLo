@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { csrf } from 'hono/csrf';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
+import { logger } from 'hono/logger';
 
 import { StatusCodes } from 'shared/src/http-status';
 
@@ -18,8 +19,18 @@ export function createApp() {
   const app = new Hono();
   const api = new Hono().basePath('/api');
 
+  app.use('*', async (c, next) => {
+    try {
+      await next();
+    } catch (err) {
+      return errorHandler(err, c);
+    }
+  });
   app.onError(errorHandler);
+
   app.use('*', requestLogger);
+  app.use(logger());
+
   app.use(cors(CORS));
   app.use(csrf());
   app.use(prettyJSON());
