@@ -40,5 +40,9 @@ pnpm-debug.log*
 # Turbo
 .turbo
 
+#sst
+.sst
+sst-env.d.ts
+
 # Misc
 internal-docs

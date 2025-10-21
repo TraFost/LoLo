@@ -5,16 +5,19 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/dev.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.4.1",
+    "@hono/zod-validator": "^0.7.4",
     "dotenv": "17.2.3",
     "hono": "^4.7.11",
-    "shared": "workspace:*"
+    "shared": "workspace:*",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/node": "^22.15.31",
+    "esbuild": "^0.25.11",
     "tsx": "^4.7.0"
   }
 }

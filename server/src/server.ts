@@ -1,49 +1,50 @@
-import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { csrf } from 'hono/csrf';
-import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
+import { logger } from 'hono/logger';
 
 import { StatusCodes } from 'shared/src/http-status';
 
-import type { ApiResponse } from 'shared/src/types/response';
+import accountRoutes from './routes/account.route';
 
-import { ENV } from './configs/env.config';
 import { CORS } from './configs/cors.config';
 
-const app = new Hono();
-const api = new Hono().basePath('/api');
+import { errorHandler } from './lib/utils/response.util';
 
-app.use(cors(CORS));
-app.use(csrf());
-app.use(logger());
-app.use(prettyJSON());
-app.use(secureHeaders());
+import { requestLogger } from './middlewares/logger.middleware';
 
-app.get('/', (c) => {
-  return c.text('Hello from LoLo Server!');
-});
+export function createApp() {
+  const app = new Hono();
+  const api = new Hono().basePath('/api');
 
-api.post('analyze', (c) => {
-  return c.text('here`s your analyze!');
-});
+  app.use('*', async (c, next) => {
+    try {
+      await next();
+    } catch (err) {
+      return errorHandler(err, c);
+    }
+  });
+  app.onError(errorHandler);
 
-app.get('*', (c) => {
-  const data: ApiResponse = {
-    message: 'Endpoint not available Or you might have a typos',
-    success: false,
-  };
+  app.use('*', requestLogger);
+  app.use(logger());
 
-  return c.json(data, { status: StatusCodes.NOT_FOUND });
-});
+  app.use(cors(CORS));
+  app.use(csrf());
+  app.use(prettyJSON());
+  app.use(secureHeaders());
 
-console.log(`Server is running on port ${ENV.port}`);
+  app.get('/', (c) => c.text('Hello from LoLo Server'));
 
-serve({
-  fetch: app.fetch,
-  port: ENV.port,
-});
+  api.route('/account', accountRoutes);
 
-export default app;
+  app.route('/', api);
+
+  app.notFound((c) =>
+    c.json({ success: false, message: 'Route not found' }, StatusCodes.NOT_FOUND),
+  );
+
+  return app;
+}

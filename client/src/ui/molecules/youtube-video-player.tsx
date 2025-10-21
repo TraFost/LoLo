@@ -53,7 +53,7 @@ export function YouTubePlayer({
 }: YouTubePlayerProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [playing, setPlaying] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered] = useState(false);
 
   const extractVideoId = (id: string) => {
     if (id.includes('youtube.com') || id.includes('youtu.be')) {
