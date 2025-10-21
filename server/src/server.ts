@@ -8,6 +8,7 @@ import { logger } from 'hono/logger';
 import { StatusCodes } from 'shared/src/http-status';
 
 import accountRoutes from './routes/account.route';
+import statisticsRoutes from './routes/statistics.route';
 
 import { CORS } from './configs/cors.config';
 
@@ -39,6 +40,7 @@ export function createApp() {
   app.get('/', (c) => c.text('Hello from LoLo Server'));
 
   api.route('/account', accountRoutes);
+  api.route('/statistics', statisticsRoutes);
 
   app.route('/', api);
 
