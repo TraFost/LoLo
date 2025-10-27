@@ -1,6 +1,6 @@
 import type { Region } from '../types/account.type';
 
-export const REGION_MAP: Record<string, string> = {
+export const REGION_MAP: Record<string, Region> = {
   // Americas
   na: 'americas',
   na1: 'americas',
