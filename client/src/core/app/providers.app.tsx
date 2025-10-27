@@ -1,13 +1,16 @@
 import type { ReactNode } from 'react';
 
 import { AppRouter } from './router.app';
+import { QueryProvider } from '@/providers/query.provider';
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
-    <main className="size-full">
-      <AppRouter />
+    <QueryProvider>
+      <main className="size-full">
+        <AppRouter />
 
-      {children}
-    </main>
+        {children}
+      </main>
+    </QueryProvider>
   );
 }

@@ -5,6 +5,10 @@ import axios, {
   type AxiosRequestConfig,
 } from 'axios';
 import qs from 'qs';
+import http from 'node:http';
+import https from 'node:https';
+
+import { sleep } from './utils';
 
 export type HttpInstance = AxiosInstance;
 
@@ -17,10 +21,6 @@ type CreateClientOpts = {
   onLog?: (msg: string, ctx?: any) => void;
 };
 
-function sleep(ms: number) {
-  return new Promise((res) => setTimeout(res, ms));
-}
-
 export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
   const {
     baseURL,
@@ -31,6 +31,9 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
     onLog,
   } = opts;
 
+  const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 128 });
+  const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 128 });
+
   const instance = axios.create({
     baseURL,
     timeout: timeoutMs,
@@ -40,21 +43,18 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
       'User-Agent': userAgent,
       ...defaultHeaders,
     },
-    paramsSerializer: {
-      serialize: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
-    },
+    paramsSerializer: { serialize: (params) => qs.stringify(params, { arrayFormat: 'repeat' }) },
     validateStatus: (s) => s >= 200 && s < 300,
+    httpAgent,
+    httpsAgent,
+    decompress: true,
+    transitional: { clarifyTimeoutError: true },
   });
 
   instance.interceptors.request.use((cfg) => {
     const id = crypto.randomUUID();
-
-    if (cfg.headers instanceof AxiosHeaders) {
-      cfg.headers.set('X-Request-Id', id);
-    } else {
-      (cfg.headers as Record<string, string>)['X-Request-Id'] = id;
-    }
-
+    if (cfg.headers instanceof AxiosHeaders) cfg.headers.set('X-Request-Id', id);
+    else (cfg.headers as Record<string, string>)['X-Request-Id'] = id;
     return cfg;
   });
 
@@ -70,7 +70,9 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
       if (shouldRetry && cfg.__retryCount < retries) {
         cfg.__retryCount++;
         const ra = error.response?.headers?.['retry-after'];
-        const delay = ra ? Number(ra) * 1000 : Math.min(1000 * 2 ** cfg.__retryCount, 5000);
+        const delay = ra
+          ? Number(ra) * 1000
+          : 300 + Math.floor(Math.random() * 400) + 2 ** cfg.__retryCount * 200;
         onLog?.('retrying request', { url: cfg.url, attempt: cfg.__retryCount, status, delay });
         await sleep(delay);
         return instance(cfg);

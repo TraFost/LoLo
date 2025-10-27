@@ -1,4 +1,6 @@
 import { HeroesSummarize } from '../components/heroes.summarize';
+import { GameplayOverview } from '../components/gameplay-overview.summarize';
+import { ProPlayer } from '../components/pro-player.summarize';
 import { RecapIntro } from '../components/recap-intro.summarize';
 import { Statistics } from '../components/statistics.summarize';
 
@@ -8,11 +10,8 @@ export function SummarizePage() {
       <RecapIntro />
       <Statistics />
       <HeroesSummarize />
-      <div className="h-[1000px]">
-        <p className="text-5xl lg:text-7xl font-bold my-24 text-center mt-40 px-52">
-          enough with the stats — let's see how your gameplay really looks!
-        </p>
-      </div>
+      <GameplayOverview />
+      <ProPlayer />
     </div>
   );
 }
