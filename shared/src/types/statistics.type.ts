@@ -37,7 +37,6 @@ export interface StatisticsResponse {
   gameplay: GameplayData;
 }
 
-// Riot API DTOs
 export interface MatchDTO {
   metadata: {
     matchId: string;

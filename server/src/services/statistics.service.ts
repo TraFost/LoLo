@@ -23,12 +23,25 @@ export class StatisticsService {
   private concurrency = 16;
 
   constructor(platformRegion: string) {
-    const regional = REGION_MAP[platformRegion] || 'asia';
+    const key = (platformRegion || '').toLowerCase().trim();
+    const regional = REGION_MAP[key] ?? (['kr', 'jp1'].includes(key) ? 'asia' : 'americas');
+
+    const baseURL = `https://${regional}.api.riotgames.com`;
+
+    console.log(`[riot] using region "${key}" → base ${baseURL}`);
+
     this.regionalClient = createHttpClient({
-      baseURL: `https://${regional}.api.riotgames.com`,
+      baseURL,
       timeoutMs: 15000,
-      retries: 0,
+      retries: 1,
       defaultHeaders: { 'X-Riot-Token': ENV.riot_api },
+      onLog: (msg, ctx) => {
+        if (msg === 'request failed' && ctx.code === 'ENOTFOUND') {
+          console.warn(
+            `[riot] DNS failure for ${ctx.url}. Check your region code or DNS resolver.`,
+          );
+        }
+      },
     });
   }
 

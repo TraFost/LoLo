@@ -19,7 +19,7 @@ app.get(
   zValidator('query', statisticsQuerySchema),
   async (c) => {
     const { puuid } = c.req.param();
-    const region = c.req.query('region')!;
+    const region = c.req.query('region')?.toLowerCase()!;
 
     const statisticsService = new StatisticsService(region);
 
