@@ -15,7 +15,7 @@ import type { Region } from 'shared/src/types/account.type';
 const app = new Hono();
 
 app.get('/:gameName/:tagLine', zValidator('param', accountSchema), async (c) => {
-  const platformRegion = c.req.query('region') ?? 'ph2';
+  const platformRegion = c.req.query('region') ?? 'kr';
 
   const { gameName, tagLine } = c.req.param();
 
