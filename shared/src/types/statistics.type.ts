@@ -21,14 +21,13 @@ export interface RoleDistribution {
   value: number;
 }
 
-export interface ChartStatistics {
-  kda: MonthlyMetric[];
-  net_worth: MonthlyMetric[];
-  cs: MonthlyMetric[];
+export interface RoleChartStatistics {
+  role: 'ADC' | 'Mid' | 'Jungle' | 'Top' | 'Support';
+  metrics: Record<string, MonthlyMetric[]>;
 }
 
 export interface GameplayData {
-  chartStatistics: ChartStatistics;
+  chartStatistics: RoleChartStatistics;
   roleDistribution: RoleDistribution[];
 }
 
@@ -47,6 +46,7 @@ export interface MatchDTO {
   info: {
     gameCreation: number;
     gameDuration: number;
+    queueId: number;
     participants: ParticipantDTO[];
   };
 }
@@ -58,14 +58,36 @@ export interface ParticipantDTO {
   championId: number;
   teamId: number;
   win: boolean;
+
+  // Core combat
   kills: number;
   deaths: number;
   assists: number;
-  totalDamageDealtToChampions: number;
+  pentaKills: number;
+
+  // Economy / farming
   goldEarned: number;
   totalMinionsKilled: number;
   neutralMinionsKilled: number;
-  pentaKills: number;
+
+  // Damage
+  totalDamageDealtToChampions: number;
+  totalDamageTaken: number;
+
+  // Vision & utility
+  visionScore?: number;
+  challenges?: {
+    visionScore?: number;
+    soloKills?: number;
+    dragonTakedowns?: number;
+    baronTakedowns?: number;
+    riftHeraldTakedowns?: number;
+  };
+
+  // Duration
+  timePlayed?: number;
+
+  // Positioning
   teamPosition: string;
   individualPosition: string;
 }

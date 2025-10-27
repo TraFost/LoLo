@@ -19,13 +19,12 @@ app.get(
   zValidator('query', statisticsQuerySchema),
   async (c) => {
     const { puuid } = c.req.param();
-    const region = c.req.query('region') ?? 'ph2';
-    const count = parseInt(c.req.query('count') ?? '100', 10);
+    const region = c.req.query('region')!;
 
     const statisticsService = new StatisticsService(region);
 
     try {
-      const data = await statisticsService.getStatistics(puuid, count);
+      const data = await statisticsService.getStatistics(puuid);
       return c.json(successWithData('Statistics fetched successfully!', data), StatusCodes.OK);
     } catch (err: unknown) {
       console.error('Error fetching statistics:', err);

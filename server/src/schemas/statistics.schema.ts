@@ -5,6 +5,5 @@ export const statisticsSchema = z.object({
 });
 
 export const statisticsQuerySchema = z.object({
-  region: z.string().optional().default('ph2'),
-  count: z.string().optional().default('100').transform(Number),
+  region: z.string(),
 });
