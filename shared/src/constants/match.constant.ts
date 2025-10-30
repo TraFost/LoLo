@@ -1,5 +1,7 @@
 import type { Region } from '../types/account.type';
 
+export const RANKED_MATCH = '420';
+
 export const REGION_MAP: Record<string, Region> = {
   // Americas
   na: 'americas',
@@ -25,3 +27,17 @@ export const REGION_MAP: Record<string, Region> = {
   tw2: 'sea',
   vn2: 'sea',
 };
+
+export const PLATFORM_HOST_MAP: Record<string, string> = {
+  na1: 'na1',
+  euw1: 'euw1',
+  eun1: 'eun1',
+  kr: 'kr',
+  jp1: 'jp1',
+  br1: 'br1',
+  la1: 'la1',
+  la2: 'la2',
+  oce: 'oce',
+  tr1: 'tr1',
+  ru: 'ru',
+} as const;
