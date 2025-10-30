@@ -8,7 +8,27 @@ export default $config({
     const apiFn = new sst.aws.Function('ApiFn', {
       handler: 'server/src/lambda/index.handler',
       runtime: 'nodejs22.x',
-      url: true,
+      url: {
+        cors: {
+          allowOrigins: ['localhost:5173'],
+          allowMethods: ['POST', 'OPTIONS'],
+          allowHeaders: ['content-type', 'authorization'],
+        },
+      },
+      timeout: '30 seconds',
+      memory: '512 MB',
+      environment: {
+        AWS_REGION: 'ap-southeast-1',
+        AWS_MODEL_ID: 'apac.amazon.nova-micro-v1:0',
+      },
+      permissions: [
+        {
+          actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
+          resources: [
+            'arn:aws:bedrock:ap-southeast-1::foundation-model/apac.amazon.nova-micro-v1:0',
+          ],
+        },
+      ],
       nodejs: { sourcemap: true, install: ['pnpm -w i', 'pnpm -w -F shared build'] },
       // environment: { NODE_ENV: 'production' },
       tags: {
