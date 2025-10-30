@@ -15,7 +15,13 @@ import type { Region } from 'shared/src/types/account.type';
 const app = new Hono();
 
 app.get('/:gameName/:tagLine', zValidator('param', accountSchema), async (c) => {
-  const platformRegion = c.req.query('region') ?? 'kr';
+  const platformRegion = c.req.query('region');
+
+  if (!platformRegion?.trim()) {
+    throw new HTTPException(StatusCodes.BAD_REQUEST, {
+      message: 'Region is Required!',
+    });
+  }
 
   const { gameName, tagLine } = c.req.param();
 
@@ -23,7 +29,12 @@ app.get('/:gameName/:tagLine', zValidator('param', accountSchema), async (c) => 
 
   try {
     const data = await accountService.getAccountByRiotId({ gameName, tagLine });
-    return c.json(successWithData('LoL Account Fetched!', data), StatusCodes.OK);
+    const profilePict = await accountService.getAccountPict(data.puuid);
+
+    return c.json(
+      successWithData('LoL Account Fetched!', { ...data, profilePict }),
+      StatusCodes.OK,
+    );
   } catch (err: unknown) {
     console.error(err, 'err');
 
