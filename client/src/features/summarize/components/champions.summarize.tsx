@@ -1,42 +1,12 @@
 import { motion } from 'motion/react';
 import { useRef } from 'react';
+import { ChampionStats } from 'shared/src/types/statistics.type';
 
-type Champions = { name: string; matches: number; wins: number; winrate: number }[];
+interface Props {
+  champions: ChampionStats[] | [];
+}
 
-const champions: Champions = [
-  {
-    name: 'Yuumi',
-    matches: 543,
-    wins: 30,
-    winrate: 66.7,
-  },
-  {
-    name: 'Aatrox',
-    matches: 346,
-    wins: 30,
-    winrate: 66.7,
-  },
-  {
-    name: 'Ahri',
-    matches: 247,
-    wins: 30,
-    winrate: 66.7,
-  },
-  {
-    name: 'Jinx',
-    matches: 215,
-    wins: 30,
-    winrate: 66.7,
-  },
-  {
-    name: 'Lee Sin',
-    matches: 145,
-    wins: 30,
-    winrate: 66.7,
-  },
-];
-
-export function HeroesSummarize() {
+export function ChampionsSummarize({ champions }: Props) {
   return (
     <>
       <div className="hidden lg:block w-full">
@@ -49,7 +19,7 @@ export function HeroesSummarize() {
   );
 }
 
-function ChampionsDesktop({ champions }: { champions: Champions }) {
+function ChampionsDesktop({ champions }: Props) {
   const ref = useRef(null);
 
   return (
@@ -71,50 +41,54 @@ function ChampionsDesktop({ champions }: { champions: Champions }) {
       </div>
 
       <div className="lg:absolute top-[100vh] left-0 w-full flex flex-col items-center">
-        {champions.map((champ, i) => {
-          const isEven = i % 2 === 0;
-          return (
-            <motion.div
-              key={i}
-              className={`w-full flex justify-${isEven ? 'start' : 'end'} px-24 ${
-                i !== 0 ? 'lg:-mt-24' : ''
-              }`}
-              initial={{ opacity: 0, x: isEven ? -100 : 100 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              <div className="relative overflow-hidden">
-                <img
-                  src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.name.replace(
-                    /\s+/g,
-                    '',
-                  )}_0.jpg`}
-                  alt={champ.name}
-                  className="h-72 lg:h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        {champions.length !== 0 && (
+          <>
+            {champions.map((champ, i) => {
+              const isEven = i % 2 === 0;
+              return (
+                <motion.div
+                  key={i}
+                  className={`w-full flex justify-${isEven ? 'start' : 'end'} px-24 ${
+                    i !== 0 ? 'lg:-mt-24' : ''
+                  }`}
+                  initial={{ opacity: 0, x: isEven ? -100 : 100 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.name.replace(
+                        /\s+/g,
+                        '',
+                      )}_0.jpg`}
+                      alt={champ.name}
+                      className="h-72 lg:h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-                <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col">
-                  <h2 className="text-4xl font-bold text-white font-[Bebas_Neue] mb-2">
-                    {champ.name}
-                  </h2>
-                  <div className="flex justify-between text-white/90 text-center lg:text-lg font-medium">
-                    <p>{champ.matches} Matches</p>
-                    <p>{champ.wins} Wins</p>
-                    <p>{champ.winrate}% WR</p>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col">
+                      <h2 className="text-4xl font-bold text-white font-[Bebas_Neue] mb-2">
+                        {champ.name}
+                      </h2>
+                      <div className="flex justify-between text-white/90 text-center lg:text-lg font-medium">
+                        <p>{champ.matches} Matches</p>
+                        <p>{champ.wins} Wins</p>
+                        <p>{champ.winrate.toFixed(1)}% WR</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
+                </motion.div>
+              );
+            })}
+          </>
+        )}
       </div>
     </section>
   );
 }
 
-function ChampionsMobile({ champions }: { champions: Champions }) {
+function ChampionsMobile({ champions }: Props) {
   return (
     <section className="relative w-full flex flex-col items-center py-8">
       {/* Header */}

@@ -3,6 +3,7 @@ import { DonutChart } from '@/ui/molecules/chart-donut.molecule';
 import { ChartAreaLinear } from '@/ui/molecules/chart-linear.molecule';
 import { useRoleStats } from '../hooks/useRoleStats';
 import { ChevronUp } from 'lucide-react';
+import { RoleDistribution } from 'shared/src/types/statistics.type';
 
 const gameplay = {
   chartStatistics: {
@@ -90,7 +91,11 @@ const gameplay = {
   },
 };
 
-export function GameplayOverview() {
+interface Props {
+  roleDistribution: RoleDistribution[];
+}
+
+export function GameplayOverview({ roleDistribution }: Props) {
   return (
     <section>
       <div className="my-24 mt-40 lg:px-52">
@@ -104,7 +109,7 @@ export function GameplayOverview() {
             <ChartAreaLinear data={gameplay.chartStatistics} />
 
             {/* Role Distribution Section */}
-            <RoleDistributionSection />
+            <RoleDistributionSection roleDistribution={roleDistribution} />
           </div>
         </div>
         {/* LoLo Analysis Section */}
@@ -151,15 +156,15 @@ export function GameplayOverview() {
   );
 }
 
-function RoleDistributionSection() {
-  const { getPercentage, total } = useRoleStats(gameplay.roleDistribution);
+function RoleDistributionSection({ roleDistribution }: Props) {
+  const { getPercentage, total } = useRoleStats(roleDistribution);
   return (
     <div className="space-y-6">
       <p className="text-2xl font-semibold">Role Distribution</p>
       <div className="w-full flex flex-col lg:flex-row gap-4">
-        <DonutChart data={gameplay.roleDistribution} totalValues={total} />
+        <DonutChart data={roleDistribution} totalValues={total} />
         <div className="w-full space-y-3">
-          {gameplay.roleDistribution.map((role) => (
+          {roleDistribution.map((role) => (
             <div key={role.role} className="flex items-center w-full">
               <div className="w-2/12 pr-4">
                 <p className="text-sm truncate">{role.role}</p>
