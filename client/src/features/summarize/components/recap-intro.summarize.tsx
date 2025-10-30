@@ -1,6 +1,11 @@
 import { motion } from 'motion/react';
 
-export function RecapIntro() {
+interface Props {
+  gameName: string;
+  tagName: string;
+}
+
+export function RecapIntro({ gameName, tagName }: Props) {
   return (
     <section className="w-full h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
       <motion.div
@@ -40,7 +45,7 @@ export function RecapIntro() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 1 }}
         >
-          LoLo<span className="text-primary">#AI</span>
+          {gameName}#<span className="text-primary">{tagName}</span>
         </motion.h1>
       </motion.div>
 
