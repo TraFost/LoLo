@@ -40,6 +40,7 @@ export function SummarizePage() {
         <p>{error?.message}</p>
       </div>
     );
+  console.log(isError);
 
   return (
     <div className="flex flex-col items-center bg-gray-950 text-white">
