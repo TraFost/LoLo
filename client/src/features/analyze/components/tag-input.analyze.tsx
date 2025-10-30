@@ -1,10 +1,30 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Button } from '@/ui/atoms/button.atom';
+import { REGION_MAP } from 'shared/src/constants/match.constant';
+import { useNavigate } from 'react-router';
+
+const validateAndSplitRiotId = (fullRiotId: string) => {
+  const regex = /^(.+)#(.+)$/;
+  const match = fullRiotId.trim().match(regex);
+  if (!match) return { isValid: false, gameName: '', tagName: '' };
+  return { isValid: true, gameName: match[1], tagName: match[2] };
+};
 
 export function TagInput() {
-  const [tag, setTag] = useState('');
+  const [username, setUsername] = useState('');
   const [region, setRegion] = useState('na');
+  const navigate = useNavigate();
+
+  const handleSubmit = () => {
+    const { isValid, gameName, tagName } = validateAndSplitRiotId(username);
+
+    if (isValid) {
+      navigate(`/summarize?game=${gameName}&tag=${tagName}`);
+    } else {
+      console.error('Error in tag input');
+    }
+  };
 
   return (
     <div className="h-screen w-full flex flex-col items-center justify-center gap-12 bg-gradient-to-br from-black via-[#0a0b1f] to-[#02030a] text-white px-6 relative">
@@ -34,8 +54,8 @@ export function TagInput() {
         <div className="relative">
           <input
             type="text"
-            value={tag}
-            onChange={(e) => setTag(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="p-5 w-80 bg-slate-900/60 text-white placeholder-slate-500 focus:outline-none focus:bg-slate-900/80 transition-all duration-300 font-medium tracking-wide"
             placeholder="LoLo#AI"
           />
@@ -48,10 +68,11 @@ export function TagInput() {
             onChange={(e) => setRegion(e.target.value)}
             className="p-5 bg-slate-900/80 text-white focus:outline-none focus:bg-slate-900 transition-all duration-300 w-40 font-medium appearance-none cursor-pointer"
           >
-            <option value="na">NORTH AMERICA</option>
-            <option value="euw">EUROPE WEST</option>
-            <option value="kr">KOREA</option>
-            <option value="asia">ASIA</option>
+            {Object.keys(REGION_MAP).map((region) => (
+              <option value={region} key={region}>
+                {region.toUpperCase()}
+              </option>
+            ))}
           </select>
           <div className="absolute inset-0 pointer-events-none flex items-center justify-end pr-4">
             <div className="w-2 h-2 border-r-2 border-b-2 border-white rotate-45 transform"></div>
@@ -65,7 +86,7 @@ export function TagInput() {
         transition={{ delay: 0.5, duration: 0.5 }}
         className="relative z-10"
       >
-        <Button variant={'flat'} color="primary" size={'lg'}>
+        <Button variant={'flat'} color="primary" size={'lg'} onClick={handleSubmit}>
           Start Analyze
         </Button>
       </motion.div>
