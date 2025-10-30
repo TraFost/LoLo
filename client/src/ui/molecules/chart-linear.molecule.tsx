@@ -4,14 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/
 import { ChartConfig, ChartContainer, ChartTooltip } from '@/ui/atoms/chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/atoms/select';
 import { useState } from 'react';
+import { MonthlyMetric } from 'shared/src/types/statistics.type';
 
 export const description = 'A linear area chart';
 
 type MetricKey = 'kda' | 'net_worth' | 'cs';
-type ChartDataPoint = {
-  month: string;
-  value: number;
-};
 
 const chartConfig = {
   kda: { label: 'KDA', color: 'var(--color-primary)' },
@@ -26,7 +23,7 @@ const options: { label: string; value: MetricKey }[] = [
 ];
 
 type Props = {
-  data: Record<MetricKey, ChartDataPoint[]>;
+  data: Record<MetricKey, MonthlyMetric[]>;
 };
 
 export function ChartAreaLinear({ data }: Props) {
