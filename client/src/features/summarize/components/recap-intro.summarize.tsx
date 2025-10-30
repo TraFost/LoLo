@@ -3,16 +3,19 @@ import { motion } from 'motion/react';
 interface Props {
   gameName: string;
   tagName: string;
+  championName: string;
 }
 
-export function RecapIntro({ gameName, tagName }: Props) {
+export function RecapIntro({ gameName, tagName, championName }: Props) {
   return (
     <section className="w-full h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
       <motion.div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yuumi_0.jpg')",
+          backgroundImage: `url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName.replace(
+            /\s+/g,
+            '',
+          )}_0.jpg')`,
           maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
         }}
