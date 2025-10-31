@@ -1,5 +1,5 @@
 export const CORS = {
-  origin: ['localhost:5173'],
+  origin: ['http://localhost:5173'],
   allowMethods: ['POST', 'GET'],
   exposeHeaders: ['Content-Length'],
 };
