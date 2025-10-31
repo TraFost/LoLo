@@ -78,6 +78,10 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
         return instance(cfg);
       }
 
+      if (status === 401 || status === 403 || status === 404) {
+        return Promise.reject(error);
+      }
+
       const norm = {
         status: status || 0,
         code: error.code || 'REQUEST_FAILED',
