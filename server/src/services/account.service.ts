@@ -1,4 +1,9 @@
-import type { AccountDTO, Account, Region, SummonerDTO } from 'shared/src/types/account.type';
+import type {
+  AccountDTO,
+  Account,
+  SummonerDTO,
+  PlatformRegion,
+} from 'shared/src/types/account.type';
 import type { HttpInstance } from 'shared/src/lib/axios';
 
 import { getLatestVersion } from '../lib/utils/ddragon.util';
@@ -8,7 +13,7 @@ export class AccountService {
   private regionalClient: HttpInstance;
   private platformClient: HttpInstance;
 
-  constructor(platformRegion: Region) {
+  constructor(platformRegion: PlatformRegion) {
     this.regionalClient = createRegionalClient(platformRegion);
     this.platformClient = createPlatformClient(platformRegion);
   }
