@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Button } from '@/ui/atoms/button.atom';
-import { REGION_MAP } from 'shared/src/constants/match.constant';
+import { PLATFORM_HOST_MAP } from 'shared/src/constants/match.constant';
 import { useNavigate } from 'react-router';
 
 const validateAndSplitRiotId = (fullRiotId: string) => {
@@ -13,14 +13,14 @@ const validateAndSplitRiotId = (fullRiotId: string) => {
 
 export function TagInput() {
   const [username, setUsername] = useState('');
-  const [region, setRegion] = useState('na');
+  const [region, setRegion] = useState(Object.keys(PLATFORM_HOST_MAP)[0]);
   const navigate = useNavigate();
 
   const handleSubmit = () => {
     const { isValid, gameName, tagName } = validateAndSplitRiotId(username);
 
     if (isValid) {
-      navigate(`/summarize?game=${gameName}&tag=${tagName}`);
+      navigate(`/summarize?game=${gameName}&tag=${tagName}&region=${region}`);
     } else {
       console.error('Error in tag input');
     }
@@ -68,7 +68,7 @@ export function TagInput() {
             onChange={(e) => setRegion(e.target.value)}
             className="p-5 bg-slate-900/80 text-white focus:outline-none focus:bg-slate-900 transition-all duration-300 w-40 font-medium appearance-none cursor-pointer"
           >
-            {Object.keys(REGION_MAP).map((region) => (
+            {Object.keys(PLATFORM_HOST_MAP).map((region) => (
               <option value={region} key={region}>
                 {region.toUpperCase()}
               </option>
