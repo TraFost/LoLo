@@ -72,7 +72,7 @@ export class AnalyzeService {
     const url = `/lol/match/v5/matches/by-puuid/${puuid}/ids`;
     const params = new URLSearchParams({
       start: '0',
-      count: '20',
+      count: '5',
       queue: RANKED_MATCH,
     });
 
