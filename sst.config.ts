@@ -17,17 +17,13 @@ export default $config({
       runtime: 'nodejs22.x',
       url: {
         cors: {
-          allowOrigins: ['localhost:5173'],
+          allowOrigins: ['http://localhost:5173'],
           allowMethods: ['POST', 'OPTIONS'],
           allowHeaders: ['content-type', 'authorization'],
         },
       },
       timeout: '30 seconds',
       memory: '512 MB',
-      environment: {
-        AWS_REGION: 'ap-southeast-1',
-        AWS_MODEL_ID: 'apac.amazon.nova-micro-v1:0',
-      },
       permissions: [
         {
           actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
@@ -38,6 +34,7 @@ export default $config({
       ],
       nodejs: {
         sourcemap: true,
+        // @ts-ignore
         install: false,
         copyFiles: [
           { from: 'server/node_modules', to: 'node_modules' },
