@@ -25,8 +25,12 @@ app.get('/:gameName/:tagLine', zValidator('param', accountSchema), async (c) => 
 
   try {
     const data = await accountService.getAccountByRiotId({ gameName, tagLine });
+    const profilePict = await accountService.getAccountPict(data.puuid);
 
-    return c.json(successWithData('LoL Account Fetched!', { ...data }), StatusCodes.OK);
+    return c.json(
+      successWithData('LoL Account Fetched!', { ...data, profilePict }),
+      StatusCodes.OK,
+    );
   } catch (err: any) {
     const status = err?.response?.status;
     const riotBody = err?.response?.data;
