@@ -5,6 +5,13 @@ export default $config({
     return { name: 'lolo', home: 'aws', removal: 'remove' };
   },
   async run() {
+    const fs = await import('fs');
+    const path = await import('path');
+    const dotenv = await import('dotenv');
+
+    const envFile = path.join(process.cwd(), 'server', '.env');
+    const parsed = fs.existsSync(envFile) ? dotenv.parse(fs.readFileSync(envFile, 'utf8')) : {};
+
     const apiFn = new sst.aws.Function('ApiFn', {
       handler: 'server/src/lambda/index.handler',
       runtime: 'nodejs22.x',
@@ -29,29 +36,23 @@ export default $config({
           ],
         },
       ],
-      nodejs: { sourcemap: true, install: ['pnpm -w i', 'pnpm -w -F shared build'] },
-      // environment: { NODE_ENV: 'production' },
+      nodejs: {
+        sourcemap: true,
+        install: false,
+        copyFiles: [
+          { from: 'server/node_modules', to: 'node_modules' },
+          { from: 'shared/src', to: 'shared' },
+        ],
+      },
+      environment: {
+        NODE_ENV: 'production',
+        ...parsed,
+      },
       tags: {
         'rift-rewind-hackathon': '2025',
         'app-name': 'LoLo',
       },
-      providers: {
-        aws: { region: 'ap-southeast-1', profile: 'admin-ippoda' },
-      },
     });
-
-    // const web = new sst.aws.StaticSite('Web', {
-    //   path: 'client',
-    //   build: {
-    //     command: 'pnpm -w i && pnpm --filter shared build && pnpm --filter client build',
-    //     output: 'dist',
-    //   },
-    //   environment: { VITE_API_URL: apiFn.url },
-    //   tags: {
-    //     'rift-rewind-hackathon': '2025',
-    //     'app-name': 'LoLo',
-    //   },
-    // });
 
     return { ApiUrl: apiFn.url };
   },

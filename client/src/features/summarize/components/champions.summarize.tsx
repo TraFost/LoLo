@@ -46,39 +46,46 @@ function ChampionsDesktop({ champions }: Props) {
             {champions.map((champ, i) => {
               const isEven = i % 2 === 0;
               return (
-                <motion.div
+                <div
                   key={i}
                   className={`w-full flex justify-${isEven ? 'start' : 'end'} px-24 ${
                     i !== 0 ? 'lg:-mt-24' : ''
                   }`}
-                  initial={{ opacity: 0, x: isEven ? -100 : 100 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true, amount: 0.3 }}
                 >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.name.replace(
-                        /\s+/g,
-                        '',
-                      )}_0.jpg`}
-                      alt={champ.name}
-                      className="h-72 lg:h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                  <motion.div
+                    initial={{ opacity: 0, rotateY: isEven ? -90 : 90 }}
+                    whileInView={{ opacity: 1, rotateY: 0 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    style={{
+                      transformStyle: 'preserve-3d',
+                      transformOrigin: isEven ? 'left center' : 'right center',
+                    }}
+                  >
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.name.replace(
+                          /\s+/g,
+                          '',
+                        )}_0.jpg`}
+                        alt={champ.name}
+                        className="h-72 lg:h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-                    <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col">
-                      <h2 className="text-4xl font-bold text-white font-[Bebas_Neue] mb-2">
-                        {champ.name}
-                      </h2>
-                      <div className="flex justify-between text-white/90 text-center lg:text-lg font-medium">
-                        <p>{champ.matches} Matches</p>
-                        <p>{champ.wins} Wins</p>
-                        <p>{champ.winrate.toFixed(1)}% WR</p>
+                      <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col">
+                        <h2 className="text-4xl font-bold text-white font-[Bebas_Neue] mb-2">
+                          {champ.name}
+                        </h2>
+                        <div className="flex justify-between text-white/90 text-center lg:text-lg font-medium">
+                          <p>{champ.matches} Matches</p>
+                          <p>{champ.wins} Wins</p>
+                          <p>{champ.winrate.toFixed(1)}% WR</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               );
             })}
           </>

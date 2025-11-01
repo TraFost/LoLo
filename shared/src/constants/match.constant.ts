@@ -1,8 +1,8 @@
-import type { Region } from '../types/account.type';
+import type { PlatformRegion, RoutingRegion } from '../types/account.type';
 
 export const RANKED_MATCH = '420';
 
-export const REGION_MAP: Record<string, Region> = {
+export const REGION_MAP: Record<string, RoutingRegion> = {
   // Americas
   na: 'americas',
   na1: 'americas',
@@ -20,7 +20,7 @@ export const REGION_MAP: Record<string, Region> = {
   kr: 'asia',
   jp1: 'asia',
 
-  // SEA (Garena migration regions)
+  // SEA
   ph2: 'sea',
   sg2: 'sea',
   th2: 'sea',
@@ -28,7 +28,7 @@ export const REGION_MAP: Record<string, Region> = {
   vn2: 'sea',
 };
 
-export const PLATFORM_HOST_MAP: Record<string, string> = {
+export const PLATFORM_HOST_MAP: Record<PlatformRegion, string> = {
   na1: 'na1',
   euw1: 'euw1',
   eun1: 'eun1',
@@ -37,7 +37,14 @@ export const PLATFORM_HOST_MAP: Record<string, string> = {
   br1: 'br1',
   la1: 'la1',
   la2: 'la2',
-  oce: 'oce',
+  oc1: 'oc1', // was "oce"
   tr1: 'tr1',
   ru: 'ru',
+
+  // SEA
+  ph2: 'ph2',
+  sg2: 'sg2',
+  th2: 'th2',
+  tw2: 'tw2',
+  vn2: 'vn2',
 } as const;

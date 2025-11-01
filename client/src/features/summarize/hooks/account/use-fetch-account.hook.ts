@@ -8,16 +8,17 @@ import type { ResponseWithData } from 'shared/src/types/response';
 export const fetchAccount = async ({
   gameName,
   tagName,
+  region,
 }: {
   gameName: string;
   tagName: string;
+  region: string;
 }): Promise<AccountDTO> => {
   try {
     const res = await axios.get<ResponseWithData<AccountDTO>>(
-      `http://localhost:3000/api/account/${gameName}/${tagName}`,
+      `http://localhost:3000/api/account/${gameName}/${tagName}?region=${region}`,
     );
     const response = res.data;
-    console.log(response);
 
     if (!response.success) {
       throw new Error(response.message || 'API call was not successful');
@@ -27,7 +28,7 @@ export const fetchAccount = async ({
     if (axios.isAxiosError(error)) {
       console.error('Axios error details: ', error.response?.data);
 
-      const errorMessage: string = error.response?.data?.details.data.status.message;
+      const errorMessage: string = error.response?.data?.details.message;
 
       throw new Error(errorMessage);
     } else {
@@ -43,6 +44,7 @@ export function useFetchAccount() {
 
   const gameName = searchParams.get('game');
   const tagName = searchParams.get('tag');
+  const region = searchParams.get('region');
 
   const isMissingParams = searchParams.size === 0;
 
@@ -53,15 +55,17 @@ export function useFetchAccount() {
   }, [isMissingParams, navigate]);
 
   const query = useQuery({
-    queryKey: ['account', gameName, tagName],
-    queryFn: () => fetchAccount({ gameName: gameName!, tagName: tagName! }),
+    queryKey: ['account', gameName, tagName, region],
+    queryFn: () => fetchAccount({ gameName: gameName!, tagName: tagName!, region: region! }),
     enabled: !isMissingParams,
     retry: 1,
     refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 60 * 24,
   });
 
   return {
     ...query,
     isMissingParams,
+    region,
   };
 }

@@ -1,59 +1,11 @@
 import { Progress } from '@/ui/atoms/progress';
 import { DonutChart } from '@/ui/molecules/chart-donut.molecule';
 import { ChartAreaLinear } from '@/ui/molecules/chart-linear.molecule';
-import { useRoleStats } from '../hooks/useRoleStats';
+import { useRoleStats } from '../hooks/role/use-role-stats.hook';
 import { ChevronUp } from 'lucide-react';
-import { RoleDistribution } from 'shared/src/types/statistics.type';
+import { GameplayData, RoleDistribution } from 'shared/src/types/statistics.type';
 
 const gameplay = {
-  chartStatistics: {
-    kda: [
-      { month: 'January', value: 3.2 },
-      { month: 'February', value: 2.9 },
-      { month: 'March', value: 4.1 },
-      { month: 'April', value: 3.8 },
-      { month: 'May', value: 4.5 },
-      { month: 'June', value: 2.9 },
-      { month: 'July', value: 3.7 },
-      { month: 'August', value: 3.1 },
-      { month: 'September', value: 4.1 },
-      { month: 'October', value: 2.2 },
-      { month: 'November', value: 3.5 },
-    ],
-    net_worth: [
-      { month: 'January', value: 8500 },
-      { month: 'February', value: 9000 },
-      { month: 'March', value: 12000 },
-      { month: 'April', value: 11000 },
-      { month: 'May', value: 12500 },
-      { month: 'June', value: 14000 },
-      { month: 'July', value: 14500 },
-      { month: 'August', value: 11000 },
-      { month: 'September', value: 14700 },
-      { month: 'October', value: 10000 },
-      { month: 'November', value: 11000 },
-    ],
-    cs: [
-      { month: 'January', value: 230 },
-      { month: 'February', value: 250 },
-      { month: 'March', value: 270 },
-      { month: 'April', value: 240 },
-      { month: 'May', value: 260 },
-      { month: 'June', value: 280 },
-      { month: 'July', value: 200 },
-      { month: 'August', value: 180 },
-      { month: 'September', value: 190 },
-      { month: 'October', value: 210 },
-      { month: 'November', value: 220 },
-    ],
-  },
-  roleDistribution: [
-    { role: 'Jungle', value: 200 },
-    { role: 'Mid', value: 100 },
-    { role: 'Top', value: 80 },
-    { role: 'ADC', value: 60 },
-    { role: 'Support', value: 40 },
-  ],
   analysis: {
     overall:
       'LoLo exhibits a balanced gameplay style with a strong emphasis on Jungle role, showcasing adaptability and strategic decision-making across various in-game scenarios.',
@@ -91,11 +43,17 @@ const gameplay = {
   },
 };
 
-interface Props {
+interface RoleDistributionProps {
   roleDistribution: RoleDistribution[];
 }
 
-export function GameplayOverview({ roleDistribution }: Props) {
+interface Props {
+  gameplayData: GameplayData;
+}
+
+export function GameplayOverview({ gameplayData }: Props) {
+  const { chartStatistics, roleDistribution } = gameplayData;
+
   return (
     <section>
       <div className="my-24 mt-40 lg:px-52">
@@ -106,7 +64,7 @@ export function GameplayOverview({ roleDistribution }: Props) {
       <div className="mt-16 mx-4 lg:mx-24 flex flex-col lg:flex-row gap-6">
         <div className="basis-2/3">
           <div className="lg:w-3/4 mx-auto flex flex-col gap-12">
-            <ChartAreaLinear data={gameplay.chartStatistics} />
+            <ChartAreaLinear chartStatistics={chartStatistics} />
 
             {/* Role Distribution Section */}
             <RoleDistributionSection roleDistribution={roleDistribution} />
@@ -156,7 +114,7 @@ export function GameplayOverview({ roleDistribution }: Props) {
   );
 }
 
-function RoleDistributionSection({ roleDistribution }: Props) {
+function RoleDistributionSection({ roleDistribution }: RoleDistributionProps) {
   const { getPercentage, total } = useRoleStats(roleDistribution);
   return (
     <div className="space-y-6">

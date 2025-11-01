@@ -4,9 +4,10 @@ interface Props {
   gameName: string;
   tagName: string;
   championName: string;
+  profilePict: string;
 }
 
-export function RecapIntro({ gameName, tagName, championName }: Props) {
+export function RecapIntro({ gameName, tagName, championName, profilePict }: Props) {
   return (
     <section className="w-full h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
       <motion.div
@@ -32,8 +33,8 @@ export function RecapIntro({ gameName, tagName, championName }: Props) {
         transition={{ duration: 1.2, ease: 'easeOut' }}
       >
         <motion.img
-          src="https://ddragon.leagueoflegends.com/cdn/15.20.1/img/profileicon/685.png"
-          alt="LoLo AI"
+          src={profilePict}
+          alt={profilePict}
           width={128}
           height={128}
           className="drop-shadow-[0_0_20px_rgba(59,130,246,0.4)] rounded-full"
