@@ -25,7 +25,6 @@ export interface AccountDTO {
   puuid: string;
   gameName: string;
   tagLine: string;
-  profilePict: string;
 }
 
 export interface SummonerDTO {
