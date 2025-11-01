@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Button } from '@/ui/atoms/button.atom';
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 
 const playerAnalysis = [
@@ -26,10 +25,10 @@ const proPlayer = {
 export function ProPlayer() {
   const [status, setStatus] = useState<'locked' | 'loading' | 'revealed'>('locked');
 
-  const handleAnalyze = () => {
-    setStatus('loading');
-    setTimeout(() => setStatus('revealed'), 2500);
-  };
+  useEffect(() => {
+    setTimeout(() => setStatus('loading'), 500);
+    setTimeout(() => setStatus('revealed'), 1000);
+  }, []);
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden mt-24 grid grid-cols-1 lg:grid-cols-2">
@@ -38,9 +37,13 @@ export function ProPlayer() {
 
       {/* LEFT - Player Stats */}
       <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
+        initial={{ x: -500 }}
+        whileInView={{ x: 0 }}
+        viewport={{ once: true }}
+        transition={{
+          duration: 0.3,
+          ease: 'linear', // gerak lurus tanpa halus
+        }}
         className="flex flex-col justify-center items-center p-6 lg:pr-12"
       >
         <div className="max-w-md text-center lg:text-left">
@@ -74,9 +77,6 @@ export function ProPlayer() {
               <p className="text-lg lg:text-xl text-gray-400">
                 I think I've seen a playstyle like yours before... wanna see who it is?
               </p>
-              <Button variant="flat" size="lg" onClick={handleAnalyze}>
-                Analyze My Playstyle
-              </Button>
             </motion.div>
           )}
 
@@ -98,9 +98,12 @@ export function ProPlayer() {
           {status === 'revealed' && (
             <motion.div
               key="revealed"
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 300 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
+              transition={{
+                duration: 0.3,
+                ease: 'linear', // langsung, tanpa kurva halus
+              }}
               className="relative w-full max-w-2xl mx-auto"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -135,9 +138,9 @@ export function ProPlayer() {
 
               {/* Comparison Summary */}
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
+                initial={{ opacity: 0, x: 300 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5, ease: 'linear' }}
                 className="mt-10 border-t border-gray-700 pt-6"
               >
                 <h3 className="text-3xl font-bold text-white">Match Insight</h3>
