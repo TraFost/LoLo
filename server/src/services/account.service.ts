@@ -1,32 +1,45 @@
-import { createHttpClient, type HttpInstance } from 'shared/src/lib/axios';
-import { REGION_MAP } from 'shared/src/constants/match.constant';
-import type { AccountDTO, Account, Region } from 'shared/src/types/account.type';
+import type {
+  AccountDTO,
+  Account,
+  SummonerDTO,
+  PlatformRegion,
+} from 'shared/src/types/account.type';
+import type { HttpInstance } from 'shared/src/lib/axios';
 
-import { ENV } from '../configs/env.config';
+import { getLatestVersion } from '../lib/utils/ddragon.util';
+import { createRegionalClient, createPlatformClient } from '../lib/utils/riot.util';
 
 export class AccountService {
-  private client: HttpInstance;
+  private regionalClient: HttpInstance;
+  private platformClient: HttpInstance;
 
-  constructor(platformRegion: Region) {
-    const regional = REGION_MAP[platformRegion] || 'asia';
-
-    this.client = createHttpClient({
-      baseURL: `https://${regional}.api.riotgames.com`,
-      timeoutMs: 10000,
-      retries: 3,
-      defaultHeaders: { 'X-Riot-Token': ENV.riot_api },
-    });
+  constructor(platformRegion: PlatformRegion) {
+    this.regionalClient = createRegionalClient(platformRegion);
+    this.platformClient = createPlatformClient(platformRegion);
   }
 
-  async getAccountByRiotId(params: Account): Promise<Account> {
+  async getAccountByRiotId(params: Account): Promise<AccountDTO> {
     const { gameName, tagLine } = params;
-
     const url = `/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
       gameName,
     )}/${encodeURIComponent(tagLine)}`;
-
-    const res = await this.client.get<AccountDTO>(url);
-
+    const res = await this.regionalClient.get<AccountDTO>(url);
     return res.data;
+  }
+
+  async getProfilePictUrl(version: string, profileIconId: number) {
+    return `https://ddragon.leagueoflegends.com/cdn/${encodeURIComponent(
+      version,
+    )}/img/profileicon/${encodeURIComponent(profileIconId)}.png`;
+  }
+
+  async getAccountPict(puuid: string): Promise<string> {
+    const url = `/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(puuid)}`;
+
+    const res = await this.platformClient.get<SummonerDTO>(url);
+    const version = await getLatestVersion();
+    const profilePict = await this.getProfilePictUrl(version, res.data.profileIconId);
+
+    return profilePict;
   }
 }

@@ -20,7 +20,7 @@ interface ChampionData {
 export class StatisticsService {
   private regionalClient: HttpInstance;
   private gate = new HeaderRateGate();
-  private concurrency = 16;
+  private concurrency = 12;
 
   constructor(platformRegion: string) {
     const key = (platformRegion || '').toLowerCase().trim();
@@ -33,7 +33,7 @@ export class StatisticsService {
     this.regionalClient = createHttpClient({
       baseURL,
       timeoutMs: 15000,
-      retries: 1,
+      retries: 0,
       defaultHeaders: { 'X-Riot-Token': ENV.riot_api },
       onLog: (msg, ctx) => {
         if (msg === 'request failed' && ctx.code === 'ENOTFOUND') {

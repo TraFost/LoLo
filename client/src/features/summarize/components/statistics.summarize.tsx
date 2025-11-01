@@ -1,35 +1,12 @@
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useRef } from 'react';
+import { StatisticItem } from 'shared/src/types/statistics.type';
 
-const stats = [
-  {
-    title: 'Total Games',
-    value: '1,247',
-    subtitle: 'Across all queues',
-  },
-  {
-    title: 'Win Rate',
-    value: '54.3%',
-    subtitle: '++2.1% from last year',
-  },
-  {
-    title: 'Total Kills',
-    value: '8,942',
-    subtitle: '7.2 per game',
-  },
-  {
-    title: 'Pentakills',
-    value: '12',
-    subtitle: 'One man army!',
-  },
-  {
-    title: 'Hours Played',
-    value: '487',
-    subtitle: "That's 20 days!",
-  },
-];
+interface Props {
+  statistics: StatisticItem[];
+}
 
-export function Statistics() {
+export function Statistics({ statistics }: Props) {
   return (
     <div className="w-full">
       <motion.h2
@@ -41,12 +18,12 @@ export function Statistics() {
       >
         First things first, let's look at the numbers!
       </motion.h2>
-      <HorizontalScroll />
+      <HorizontalScroll statistics={statistics} />
     </div>
   );
 }
 
-export function HorizontalScroll() {
+function HorizontalScroll({ statistics }: Props) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -59,7 +36,7 @@ export function HorizontalScroll() {
     <section ref={ref} className="relative h-[700vh]">
       <div className="sticky top-0 h-screen flex items-center overflow-hidden">
         <motion.div style={{ x }} className="flex items-center">
-          {stats.map((stat, i) => (
+          {statistics.map((stat, i) => (
             <TextBlock key={i} title={stat.title} value={stat.value} subtitle={stat.subtitle} />
           ))}
         </motion.div>

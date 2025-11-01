@@ -1,13 +1,22 @@
 import { motion } from 'motion/react';
 
-export function RecapIntro() {
+interface Props {
+  gameName: string;
+  tagName: string;
+  championName: string;
+  profilePict: string;
+}
+
+export function RecapIntro({ gameName, tagName, championName, profilePict }: Props) {
   return (
     <section className="w-full h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
       <motion.div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yuumi_0.jpg')",
+          backgroundImage: `url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName.replace(
+            /\s+/g,
+            '',
+          )}_0.jpg')`,
           maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
         }}
@@ -24,8 +33,8 @@ export function RecapIntro() {
         transition={{ duration: 1.2, ease: 'easeOut' }}
       >
         <motion.img
-          src="https://ddragon.leagueoflegends.com/cdn/15.20.1/img/profileicon/685.png"
-          alt="LoLo AI"
+          src={profilePict}
+          alt={profilePict}
           width={128}
           height={128}
           className="drop-shadow-[0_0_20px_rgba(59,130,246,0.4)] rounded-full"
@@ -40,7 +49,7 @@ export function RecapIntro() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 1 }}
         >
-          LoLo<span className="text-primary">#AI</span>
+          {gameName}#<span className="text-primary">{tagName}</span>
         </motion.h1>
       </motion.div>
 
