@@ -2,12 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import type { ResponseWithData } from 'shared/src/types/response';
 import type { StatisticsResponse } from 'shared/src/types/statistics.type';
-import { useFetchAccount } from './useFetchAccount';
+import { useFetchAccount } from '../account/use-fetch-account.hook';
 
-const fetchStatistics = async (puuid: string): Promise<StatisticsResponse> => {
+const fetchStatistics = async (puuid: string, region: string): Promise<StatisticsResponse> => {
   const res = await axios.get<ResponseWithData<StatisticsResponse>>(
     `http://localhost:3000/api/statistics/${puuid}`,
-    { params: { region: 'kr' } },
+    { params: { region } },
   );
 
   const response = res.data;
@@ -25,16 +25,18 @@ export function useFetchStatistics() {
     isError: isAccountError,
     error: accountError,
     isMissingParams,
+    region,
   } = useFetchAccount();
 
   const puuid = accountData?.puuid;
 
   const statisticsQuery = useQuery({
-    queryKey: ['statistics', puuid],
-    queryFn: () => fetchStatistics(puuid!),
+    queryKey: ['statistics', puuid, region],
+    queryFn: () => fetchStatistics(puuid!, region!),
     enabled: !!puuid && !isAccountLoading && !isMissingParams,
     retry: 1,
     refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 60 * 24,
   });
 
   return {

@@ -1,35 +1,22 @@
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/atoms/card';
-import { ChartConfig, ChartContainer, ChartTooltip } from '@/ui/atoms/chart';
+import { ChartContainer, ChartTooltip } from '@/ui/atoms/chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/atoms/select';
 import { useState } from 'react';
-import { MonthlyMetric } from 'shared/src/types/statistics.type';
-
-export const description = 'A linear area chart';
-
-type MetricKey = 'kda' | 'net_worth' | 'cs';
-
-const chartConfig = {
-  kda: { label: 'KDA', color: 'var(--color-primary)' },
-  net_worth: { label: 'Net Worth', color: 'var(--color-primary)' },
-  cs: { label: 'CS', color: 'var(--color-primary)' },
-} satisfies ChartConfig;
-
-const options: { label: string; value: MetricKey }[] = [
-  { label: 'KDA', value: 'kda' },
-  { label: 'Net Worth', value: 'net_worth' },
-  { label: 'CS', value: 'cs' },
-];
+import { RoleChartStatistics } from 'shared/src/types/statistics.type';
+import { chartHelper } from '@/features/summarize/utils/chart-config.util';
 
 type Props = {
-  data: Record<MetricKey, MonthlyMetric[]>;
+  chartStatistics: RoleChartStatistics;
 };
 
-export function ChartAreaLinear({ data }: Props) {
+export function ChartAreaLinear({ chartStatistics }: Props) {
+  const { metrics, role } = chartStatistics;
+  const { chartConfig, options } = chartHelper(metrics);
   const [selectedOption, setSelectedOption] = useState(options[0]);
 
-  const currentData = data[selectedOption.value];
+  const currentData = metrics[selectedOption.value];
   const currentConfig = chartConfig[selectedOption.value];
 
   return (
