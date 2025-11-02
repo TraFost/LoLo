@@ -4,7 +4,6 @@ import type { HttpInstance } from 'shared/src/lib/axios';
 import type { PlatformRegion } from 'shared/src/types/account.type';
 
 import { normalizeRole } from '../lib/utils/helper.util';
-import { getCurrentPatch } from '../lib/utils/ddragon.util';
 import { createRegionalClient } from '../lib/utils/riot.util';
 
 export class AnalyzeService {
@@ -14,9 +13,7 @@ export class AnalyzeService {
     this.regionalClient = createRegionalClient(platformRegion);
   }
 
-  async getImprovementAnalysis(
-    puuid: string,
-  ): Promise<{ role: string; patch: string; matchData: any[] }> {
+  async getImprovementAnalysis(puuid: string): Promise<{ role: string; matchData: any[] }> {
     const matchIds = await this.getMatchIds(puuid);
     const matches = await this.getMatchDetails(matchIds);
 
@@ -46,9 +43,7 @@ export class AnalyzeService {
       }
     }
 
-    const patch = await getCurrentPatch();
-
-    return { role, patch, matchData };
+    return { role, matchData };
   }
 
   private async getMatchIds(puuid: string): Promise<string[]> {

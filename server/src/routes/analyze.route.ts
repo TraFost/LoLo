@@ -20,10 +20,10 @@ app.post('/improvement', zValidator('json', improvementRequestSchema), async (c)
 
     const improvementService = new AnalyzeService(body.region as PlatformRegion);
 
-    const { role, patch, matchData } = await improvementService.getImprovementAnalysis(body.puuid);
+    const { role, matchData } = await improvementService.getImprovementAnalysis(body.puuid);
 
     const systemText = buildSystemPrompt();
-    const userText = buildUserPrompt(role, patch, matchData);
+    const userText = buildUserPrompt(role, matchData);
 
     const { text, stop, usage } = await invokeNovaMicroJSON(systemText, userText, {});
 
@@ -45,10 +45,7 @@ app.post('/improvement', zValidator('json', improvementRequestSchema), async (c)
       };
     }
 
-    return c.json(
-      successWithData('Improvement analysis generated', { improvement: parsed }),
-      StatusCodes.OK,
-    );
+    return c.json(successWithData('Improvement analysis generated', parsed), StatusCodes.OK);
   } catch (err: unknown) {
     console.error(err, 'Error in improvement analysis');
 
