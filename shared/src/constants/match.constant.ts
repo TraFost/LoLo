@@ -48,3 +48,18 @@ export const PLATFORM_HOST_MAP: Record<PlatformRegion, string> = {
   tw2: 'tw2',
   vn2: 'vn2',
 } as const;
+
+export const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
