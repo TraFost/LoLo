@@ -9,6 +9,7 @@ import { StatusCodes } from 'shared/src/http-status';
 
 import accountRoutes from './routes/account.route';
 import statisticsRoutes from './routes/statistics.route';
+import analyzeRoutes from './routes/analyze.route';
 
 import { CORS } from './configs/cors.config';
 
@@ -41,6 +42,7 @@ export function createApp() {
 
   api.route('/account', accountRoutes);
   api.route('/statistics', statisticsRoutes);
+  api.route('/analyze', analyzeRoutes);
 
   app.route('/', api);
 

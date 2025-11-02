@@ -15,9 +15,26 @@ export default $config({
     const apiFn = new sst.aws.Function('ApiFn', {
       handler: 'server/src/lambda/index.handler',
       runtime: 'nodejs22.x',
-      url: true,
+      url: {
+        cors: {
+          allowOrigins: ['http://localhost:5173'],
+          allowMethods: ['POST', 'OPTIONS'],
+          allowHeaders: ['content-type', 'authorization'],
+        },
+      },
+      timeout: '30 seconds',
+      memory: '512 MB',
+      permissions: [
+        {
+          actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
+          resources: [
+            'arn:aws:bedrock:ap-southeast-1::foundation-model/apac.amazon.nova-micro-v1:0',
+          ],
+        },
+      ],
       nodejs: {
         sourcemap: true,
+        // @ts-ignore
         install: false,
         copyFiles: [
           { from: 'server/node_modules', to: 'node_modules' },
