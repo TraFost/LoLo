@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
 import { StatusCodes } from 'shared/src/http-status';
+import type { PlatformRegion } from 'shared/src/types/account.type';
 
 import { AnalyzeService } from '../services/analyze.service';
 import { zValidator } from '../middlewares/validator.middleware';
@@ -17,7 +18,7 @@ app.post('/improvement', zValidator('json', improvementRequestSchema), async (c)
   try {
     const body = (await c.req.json()) as ImprovementRequest;
 
-    const improvementService = new AnalyzeService(body.region);
+    const improvementService = new AnalyzeService(body.region as PlatformRegion);
 
     const { role, patch, matchData } = await improvementService.getImprovementAnalysis(body.puuid);
 

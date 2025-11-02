@@ -1,34 +1,17 @@
-import { createHttpClient, type HttpInstance } from 'shared/src/lib/axios';
-import { RANKED_MATCH, REGION_MAP } from 'shared/src/constants/match.constant';
+import { RANKED_MATCH } from 'shared/src/constants/match.constant';
 import type { MatchDTO, ParticipantDTO } from 'shared/src/types/statistics.type';
+import type { HttpInstance } from 'shared/src/lib/axios';
+import type { PlatformRegion } from 'shared/src/types/account.type';
 
 import { normalizeRole } from '../lib/utils/helper.util';
-import { ENV } from '../configs/env.config';
+import { getCurrentPatch } from '../lib/utils/ddragon.util';
+import { createRegionalClient } from '../lib/utils/riot.util';
 
 export class AnalyzeService {
   private regionalClient: HttpInstance;
 
-  constructor(platformRegion: string) {
-    const key = (platformRegion || '').toLowerCase().trim();
-    const regional = REGION_MAP[key] ?? (['kr', 'jp1'].includes(key) ? 'asia' : 'americas');
-
-    const baseURL = `https://${regional}.api.riotgames.com`;
-
-    console.log(`[improvement] using region "${key}" → base ${baseURL}`);
-
-    this.regionalClient = createHttpClient({
-      baseURL,
-      timeoutMs: 15000,
-      retries: 1,
-      defaultHeaders: { 'X-Riot-Token': ENV.riot_api },
-      onLog: (msg, ctx) => {
-        if (msg === 'request failed' && ctx.code === 'ENOTFOUND') {
-          console.warn(
-            `[improvement] DNS failure for ${ctx.url}. Check your region code or DNS resolver.`,
-          );
-        }
-      },
-    });
+  constructor(platformRegion: PlatformRegion) {
+    this.regionalClient = createRegionalClient(platformRegion);
   }
 
   async getImprovementAnalysis(
@@ -63,7 +46,7 @@ export class AnalyzeService {
       }
     }
 
-    const patch = await this.getCurrentPatch();
+    const patch = await getCurrentPatch();
 
     return { role, patch, matchData };
   }
@@ -72,7 +55,7 @@ export class AnalyzeService {
     const url = `/lol/match/v5/matches/by-puuid/${puuid}/ids`;
     const params = new URLSearchParams({
       start: '0',
-      count: '5',
+      count: '15',
       queue: RANKED_MATCH,
     });
 
@@ -108,20 +91,6 @@ export class AnalyzeService {
     } catch (e: any) {
       console.warn(`Failed to fetch timeline ${matchId}:`, e.message);
       return null;
-    }
-  }
-
-  private async getCurrentPatch(): Promise<string> {
-    try {
-      const res = await this.regionalClient.get<string[]>(
-        'https://ddragon.leagueoflegends.com/api/versions.json',
-      );
-      const versions = res.data;
-      const latest = versions?.[0];
-      return latest ? latest.split('.').slice(0, 2).join('.') : '14.20';
-    } catch (e: any) {
-      console.warn('Failed to fetch current patch:', e.message);
-      return '14.20';
     }
   }
 
