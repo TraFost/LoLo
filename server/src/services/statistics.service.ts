@@ -1,5 +1,3 @@
-import { createHttpClient, type HttpInstance } from 'shared/src/lib/axios';
-import { REGION_MAP } from 'shared/src/constants/match.constant';
 import type {
   StatisticsResponse,
   MatchDTO,
@@ -8,44 +6,32 @@ import type {
   ChampionStats,
   MonthlyMetric,
   RoleDistribution,
+  ChampionAgg,
 } from 'shared/src/types/statistics.type';
-import { ENV } from '../configs/env.config';
-import { HeaderRateGate } from '../lib/utils/rate-limiter.util';
+import type { PlatformRegion } from 'shared/src/types/account.type';
 
-interface ChampionData {
-  matches: number;
-  wins: number;
-}
+import { HeaderRateGate } from '../lib/utils/rate-limiter.util';
+import { createPlatformClient, createRegionalClient } from '../lib/utils/riot.util';
+import { MONTHS } from 'shared/src/constants/match.constant';
 
 export class StatisticsService {
-  private regionalClient: HttpInstance;
+  private regionalClient;
+  private platformClient;
   private gate = new HeaderRateGate();
   private concurrency = 12;
 
-  constructor(platformRegion: string) {
-    const key = (platformRegion || '').toLowerCase().trim();
-    const regional = REGION_MAP[key] ?? (['kr', 'jp1'].includes(key) ? 'asia' : 'americas');
+  constructor(platformRegion: PlatformRegion) {
+    const region = platformRegion;
 
-    const baseURL = `https://${regional}.api.riotgames.com`;
-
-    console.log(`[riot] using region "${key}" → base ${baseURL}`);
-
-    this.regionalClient = createHttpClient({
-      baseURL,
-      timeoutMs: 15000,
-      retries: 0,
-      defaultHeaders: { 'X-Riot-Token': ENV.riot_api },
-      onLog: (msg, ctx) => {
-        if (msg === 'request failed' && ctx.code === 'ENOTFOUND') {
-          console.warn(
-            `[riot] DNS failure for ${ctx.url}. Check your region code or DNS resolver.`,
-          );
-        }
-      },
-    });
+    this.regionalClient = createRegionalClient(region, 0);
+    this.platformClient = createPlatformClient(region, 0);
   }
 
-  async getStatistics(puuid: string): Promise<StatisticsResponse> {
+  async getStatistics(puuid: string): Promise<
+    StatisticsResponse & {
+      champions: Array<ChampionStats>;
+    }
+  > {
     const matchIds = await this.getMatchIds(puuid);
     const matches = await this.getMatchDetails(matchIds);
 
@@ -68,14 +54,36 @@ export class StatisticsService {
 
     const playerMatches = this.filterPlayerMatches(matches, puuid);
 
+    const masteryMap = await this.getChampionMastery(puuid);
+
     return {
       statistics: this.calculateStatistics(playerMatches),
-      champions: this.calculateChampionStats(playerMatches),
+      champions: this.calculateChampionStats(playerMatches, masteryMap),
       gameplay: {
         chartStatistics: this.calculateChartStatistics(matches, puuid),
         roleDistribution: this.calculateRoleDistribution(playerMatches),
       },
     };
+  }
+
+  private async getChampionMastery(puuid: string): Promise<Map<number, any>> {
+    const url = `/lol/champion-mastery/v4/champion-masteries/by-puuid/${encodeURIComponent(puuid)}`;
+
+    try {
+      const res = await this.platformClient.get(url);
+      const map = new Map<number, any>();
+      for (const m of res.data as any[]) {
+        map.set(m.championId, {
+          level: m.championLevel,
+          points: m.championPoints,
+          chestGranted: m.chestGranted,
+        });
+      }
+      return map;
+    } catch (e) {
+      console.warn('[stats] mastery fetch failed', e);
+      return new Map();
+    }
   }
 
   private async getMatchIds(puuid: string): Promise<string[]> {
@@ -138,6 +146,7 @@ export class StatisticsService {
 
     if (dropped > matchIds.length * 0.3) {
       console.log(`[stats] high drop (${dropped}), retrying half speed`);
+
       this.concurrency = Math.max(6, Math.floor(this.concurrency / 2));
       const missing = matchIds.filter((id) => !out.find((m) => m.metadata?.matchId === id));
       const retry: MatchDTO[] = [];
@@ -161,6 +170,7 @@ export class StatisticsService {
   private async getMatchDetail(matchId: string): Promise<MatchDTO | null> {
     const url = `/lol/match/v5/matches/${matchId}`;
     let delay = 400;
+
     for (let attempt = 0; attempt < 6; attempt++) {
       try {
         await this.gate.before();
@@ -168,17 +178,33 @@ export class StatisticsService {
         await this.gate.after(res.headers as any);
         return res.data;
       } catch (e: any) {
-        const status = e?.status ?? e?.response?.status;
+        const status = e?.response?.status ?? e?.status ?? 0;
         const ra = e?.response?.headers?.['retry-after'];
+
+        if (status === 404) {
+          console.warn(`[stats] drop match ${matchId}: 404 not found`);
+          return null;
+        }
+        if (status === 403) {
+          console.warn(
+            `[stats] drop match ${matchId}: 403 forbidden (check platformRegion/baseURL/key)`,
+          );
+          return null;
+        }
+
         if (status === 429 || status >= 500) {
           const ms = ra ? Number(ra) * 1000 : delay + Math.random() * 300;
           await new Promise((r) => setTimeout(r, ms));
           delay = Math.min(delay * 2, 8000);
           continue;
         }
+
+        console.warn(`[stats] drop match ${matchId}: status=${status}`);
         return null;
       }
     }
+
+    console.warn(`[stats] drop match ${matchId}: max retries`);
     return null;
   }
 
@@ -220,23 +246,41 @@ export class StatisticsService {
     ];
   }
 
-  private calculateChampionStats(playerMatches: ParticipantDTO[]): ChampionStats[] {
-    const map = new Map<string, ChampionData>();
-    for (const m of playerMatches) {
-      const cur = map.get(m.championName) || { matches: 0, wins: 0 };
-      cur.matches++;
-      if (m.win) cur.wins++;
-      map.set(m.championName, cur);
+  private calculateChampionStats(
+    playerMatches: ParticipantDTO[],
+    masteryMap: Map<number, any>,
+  ): Array<ChampionStats> {
+    const agg = new Map<number, ChampionAgg>();
+
+    for (const p of playerMatches) {
+      const id = p.championId;
+      const name = p.championName;
+      const cur = agg.get(id) ?? { championId: id, name, matches: 0, wins: 0 };
+      cur.matches += 1;
+      if (p.win) cur.wins += 1;
+
+      cur.name = name;
+      agg.set(id, cur);
     }
-    return [...map.entries()]
-      .map(([name, d]) => ({
-        name,
-        matches: d.matches,
-        wins: d.wins,
-        winrate: (d.wins / d.matches) * 100,
-      }))
-      .sort((a, b) => b.matches - a.matches)
-      .slice(0, 5);
+
+    const out = Array.from(agg.values()).map((c) => {
+      const mastery = masteryMap.get(c.championId) ?? null;
+      return {
+        name: c.name,
+        matches: c.matches,
+        wins: c.wins,
+        winrate: (c.wins / c.matches) * 100,
+        mastery: mastery
+          ? {
+              level: mastery.level,
+              points: mastery.points,
+              chestGranted: mastery.chestGranted,
+            }
+          : null,
+      };
+    });
+
+    return out.sort((a, b) => b.matches - a.matches).slice(0, 5);
   }
 
   private normalizeRole(
@@ -359,26 +403,12 @@ export class StatisticsService {
     }
     const mostPlayed = [...roles].sort((a, b) => roleGames[b] - roleGames[a])[0] ?? 'ADC';
 
-    const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
     const perMonth = (calc: (a: Acc) => number): MonthlyMetric[] => {
       const out: MonthlyMetric[] = [];
       for (let i = 0; i < 12; i++) {
         const a = byRoleMonth[mostPlayed][i];
         const v = a?.games ? calc(a) : 0;
-        out.push({ month: monthNames[i]!, value: Number(Number.isFinite(v) ? v.toFixed(2) : 0) });
+        out.push({ month: MONTHS[i]!, value: Number(Number.isFinite(v) ? v.toFixed(2) : 0) });
       }
       return out;
     };

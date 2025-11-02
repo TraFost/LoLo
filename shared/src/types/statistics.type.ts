@@ -9,6 +9,7 @@ export interface ChampionStats {
   matches: number;
   wins: number;
   winrate: number;
+  mastery: MasteryDTO | null;
 }
 
 export interface MonthlyMetric {
@@ -99,4 +100,17 @@ export interface SummonerDTO {
   profileIconId: number;
   revisionDate: number;
   summonerLevel: number;
+}
+
+export interface MasteryDTO {
+  level: number;
+  points: number;
+  chestGranted: boolean;
+}
+
+export interface ChampionAgg {
+  championId: number;
+  name: string;
+  matches: number;
+  wins: number;
 }

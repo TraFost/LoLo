@@ -1,15 +1,14 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-import { StatisticsService } from '../services/statistics.service';
+import { StatusCodes } from 'shared/src/http-status';
+import type { PlatformRegion } from 'shared/src/types/account.type';
 
+import { StatisticsService } from '../services/statistics.service';
 import { statisticsSchema, statisticsQuerySchema } from '../schemas/statistics.schema';
 
 import { zValidator } from '../middlewares/validator.middleware';
-
 import { successWithData } from '../lib/utils/response.util';
-
-import { StatusCodes } from 'shared/src/http-status';
 
 const app = new Hono();
 
@@ -19,7 +18,7 @@ app.get(
   zValidator('query', statisticsQuerySchema),
   async (c) => {
     const { puuid } = c.req.param();
-    const region = c.req.query('region')?.toLowerCase()!;
+    const region = c.req.query('region')?.toLowerCase()! as PlatformRegion;
 
     const statisticsService = new StatisticsService(region);
 
