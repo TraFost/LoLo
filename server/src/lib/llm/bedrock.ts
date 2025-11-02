@@ -1,30 +1,30 @@
 import { InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 
-import { bedrock } from '../../configs/bedrock.config';
+import { DEFAULT_MAX_TOKENS, DEFAULT_TEMP, DEFAULT_TOP_P } from './prompt';
 
+import { bedrock } from '../../configs/bedrock.config';
 import { ENV } from '../../configs/env.config';
+
+type NovaJSON = {
+  output?: { message?: { content?: Array<{ text?: string }> } };
+  stopReason?: string;
+  usage?: any;
+};
 
 export async function invokeNovaMicroJSON(
   systemText: string,
-  userText: string,
+  userJsonString: string,
   { modelId = ENV.aws.modelId } = {},
 ) {
-  if (!modelId) {
-    throw new Error('Model ID is empty, you need to provide it!');
-  }
+  if (!modelId) throw new Error('Model ID is empty');
 
   const body = {
     system: [{ text: systemText }],
-    messages: [
-      {
-        role: 'user',
-        content: [{ text: userText }],
-      },
-    ],
+    messages: [{ role: 'user', content: [{ text: userJsonString }] }],
     inferenceConfig: {
-      maxTokens: 400,
-      temperature: 0.2,
-      topP: 0.9,
+      maxTokens: DEFAULT_MAX_TOKENS,
+      temperature: DEFAULT_TEMP,
+      topP: DEFAULT_TOP_P,
     },
   };
 
@@ -32,17 +32,28 @@ export async function invokeNovaMicroJSON(
     modelId,
     contentType: 'application/json',
     accept: 'application/json',
-    body: Buffer.from(JSON.stringify(body)),
+    body: JSON.stringify(body),
   });
 
-  const res = await bedrock.send(cmd);
-  const text = Buffer.from(res.body).toString('utf8');
-  const json = JSON.parse(text);
+  let raw: NovaJSON;
+  try {
+    const res = await bedrock.send(cmd);
+    const text = new TextDecoder().decode(res.body);
+    raw = JSON.parse(text) as NovaJSON;
+  } catch (e: any) {
+    throw new Error(`Nova invoke failed: ${e?.message ?? 'unknown error'}`);
+  }
 
-  const message = json?.output?.message;
-  const outText = message?.content?.find?.((c: any) => c.text)?.text ?? '';
-  const stop = json?.stopReason ?? 'unknown';
-  const usage = json?.usage ?? null;
+  const message = raw?.output?.message;
+  const outText = message?.content?.find?.((c) => typeof c?.text === 'string')?.text ?? '';
 
-  return { raw: json, text: outText, stop, usage };
+  let parsed: any = null;
+  try {
+    parsed = outText ? JSON.parse(outText) : null;
+  } catch {}
+
+  const stop = raw?.stopReason ?? 'unknown';
+  const usage = raw?.usage ?? null;
+
+  return { raw, text: outText, json: parsed, stop, usage };
 }
