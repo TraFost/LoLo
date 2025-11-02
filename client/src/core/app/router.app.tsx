@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider, Navigate, type RouteObject } from 
 import { HomePage } from '@/features/home/pages/home.page';
 import { AnalyzePage } from '@/features/analyze/pages/analyze.page';
 import { SummarizePage } from '@/features/summarize/page/summarize.page';
+import { TeamPage } from '@/features/team/pages/team.page';
 
 export interface Page {
   id: string;
@@ -14,7 +15,7 @@ export const PAGES: Page[] = [
   { id: 'home', label: 'Home', path: '/home', element: <HomePage /> },
   { id: 'analyze', label: 'Analyze', path: '/analyze', element: <AnalyzePage /> },
   { id: 'summarize', label: 'Summarize', path: '/summarize', element: <SummarizePage /> },
-  { id: 'team', label: 'Team', path: '/team', element: <></> },
+  { id: 'team', label: 'Team', path: '/team', element: <TeamPage /> },
 ] as const;
 
 const DEFAULT_PATH = PAGES.find((p) => p.id === 'home')!.path;
