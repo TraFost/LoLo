@@ -6,6 +6,7 @@ import {
   PolarAngleAxis,
   ResponsiveContainer,
   Tooltip,
+  TooltipProps,
 } from 'recharts';
 
 const data = [
@@ -79,12 +80,12 @@ export default function ChartRadar() {
   );
 }
 
-function CustomTooltip({ active, payload }: any) {
+function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-blue-950 border border-gray-700 text-white px-3 py-2 shadow-md">
         <p className="font-semibold">{payload[0].payload.stat}</p>
-        {payload.map((entry: any, i: number) => (
+        {payload.map((entry, i: number) => (
           <p key={i} className="text-sm" style={{ color: entry.color }}>
             {entry.name}: {entry.value}
           </p>
