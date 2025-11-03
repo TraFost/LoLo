@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import {
   Navbar,
@@ -17,6 +18,12 @@ import { PAGES } from '@/core/app/router.app';
 export function MainNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const navigate = useNavigate();
+
+  const navigateToAnalyze = () => {
+    navigate('/analyze');
+  };
+
   return (
     <div className="relative w-full">
       <Navbar>
@@ -29,6 +36,7 @@ export function MainNavbar() {
               color="accent"
               size="sm"
               className="border-transparent bg-transparent font-bold text-white hover:bg-transparent hover:-translate-y-0.5 transition duration-200"
+              onClick={navigateToAnalyze}
             >
               Get Started
             </Button>
@@ -57,7 +65,13 @@ export function MainNavbar() {
             ))}
 
             <div className="flex w-full flex-col gap-4">
-              <Button variant="flat" color="primary" size="sm" className="font-bold text-white">
+              <Button
+                variant="flat"
+                color="primary"
+                size="sm"
+                className="font-bold text-white"
+                onClick={navigateToAnalyze}
+              >
                 Get Started
               </Button>
             </div>

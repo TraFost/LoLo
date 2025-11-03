@@ -198,7 +198,7 @@ export const MobileNavToggle = ({ isOpen, onClick }: { isOpen: boolean; onClick:
 export const NavbarLogo = () => {
   return (
     <a
-      href="#"
+      href="/home"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
     >
       <img src="/assets/icon/lolo-main.webp" alt="logo" width={30} height={30} />
