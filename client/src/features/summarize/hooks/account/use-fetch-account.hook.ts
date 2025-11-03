@@ -16,7 +16,12 @@ export const fetchAccount = async ({
 }): Promise<AccountDTO> => {
   try {
     const res = await axios.get<ResponseWithData<AccountDTO>>(
-      `http://localhost:3000/api/account/${gameName}/${tagName}?region=${region}`,
+      `http://localhost:3000/api/account/${gameName}/${tagName}`,
+      {
+        params: {
+          region,
+        },
+      },
     );
     const response = res.data;
 
@@ -26,9 +31,9 @@ export const fetchAccount = async ({
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error('Axios error details: ', error.response?.data);
+      console.error('Axios error details: ', error);
 
-      const errorMessage: string = error.response?.data?.details.message;
+      const errorMessage: string = error.response?.data?.details.message || error.message;
 
       throw new Error(errorMessage);
     } else {
