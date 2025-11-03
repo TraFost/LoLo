@@ -3,7 +3,12 @@ import { GameplayOverview } from '../components/gameplay-overview.summarize';
 import { ProPlayer } from '../components/pro-player.summarize';
 import { RecapIntro } from '../components/recap-intro.summarize';
 import { Statistics } from '../components/statistics.summarize';
-import { ImageCard } from '../components/image-card.summarize';
+import {
+  ImageCardSection,
+  MostPlayedChampionsCard,
+  PlayerComparisonCard,
+  PlayerOverviewCard,
+} from '../components/image-card.summarize';
 import { LoadingSection } from '@/ui/organisms/loading-section.organism';
 import { useFetchStatistics } from '../hooks/statistics/use-fetch-statistics.hook';
 import { ErrorSection } from '@/ui/organisms/error-section.organism';
@@ -32,7 +37,6 @@ export function SummarizePage() {
 
   return (
     <>
-      {/* <LoadingSection /> */}
       <div className="flex flex-col items-center bg-gray-950 text-white">
         <RecapIntro
           gameName={accountData!.gameName}
@@ -46,7 +50,18 @@ export function SummarizePage() {
         <ChampionsSummarize champions={statistics!.champions} />
         <GameplayOverview gameplayData={statistics!.gameplay} />
         <ProPlayer />
-        <ImageCard />
+        <ImageCardSection>
+          <MostPlayedChampionsCard
+            playerName={`${accountData!.gameName}#${accountData!.tagLine}`}
+            champions={statistics!.champions}
+          />
+          <PlayerOverviewCard
+            playerName={`${accountData!.gameName}#${accountData!.tagLine}`}
+            statistics={statistics!.statistics}
+            roleDistribution={statistics!.gameplay.roleDistribution}
+          />
+          <PlayerComparisonCard />
+        </ImageCardSection>
       </div>
     </>
   );
