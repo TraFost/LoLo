@@ -39,8 +39,9 @@ export default $config({
         ],
       },
       environment: {
-        NODE_ENV: 'production',
         ...parsed,
+        NODE_ENV: 'production',
+        AWS_SDK_LOAD_CONFIG: '0',
       },
       tags: {
         'rift-rewind-hackathon': '2025',
