@@ -12,6 +12,7 @@ import {
 import { LoadingSection } from '@/ui/organisms/loading-section.organism';
 import { useFetchStatistics } from '../hooks/statistics/use-fetch-statistics.hook';
 import { ErrorSection } from '@/ui/organisms/error-section.organism';
+import { fillChampions } from '../utils/champion/fill-champions.util';
 
 export function SummarizePage() {
   const {
@@ -35,34 +36,32 @@ export function SummarizePage() {
   if (isLoading) return <LoadingSection />;
   if (isError) return <ErrorSection error={error!.message} />;
 
+  const champions = fillChampions(statistics!.champions, 5);
+
   return (
-    <>
-      <div className="flex flex-col items-center bg-gray-950 text-white">
-        <RecapIntro
-          gameName={accountData!.gameName}
-          tagName={accountData!.tagLine}
-          championName={
-            statistics!.champions.length !== 0 ? statistics!.champions[0].name : 'Yuumi'
-          }
-          profilePict={accountData!.profilePict}
+    <div className="flex flex-col items-center bg-gray-950 text-white">
+      <RecapIntro
+        gameName={accountData!.gameName}
+        tagName={accountData!.tagLine}
+        championName={champions[0].name}
+        profilePict={accountData!.profilePict}
+      />
+      <Statistics statistics={statistics!.statistics} />
+      <ChampionsSummarize champions={champions} />
+      <GameplayOverview gameplayData={statistics!.gameplay} />
+      <ProPlayer />
+      <ImageCardSection>
+        <MostPlayedChampionsCard
+          playerName={`${accountData!.gameName}#${accountData!.tagLine}`}
+          champions={champions}
         />
-        <Statistics statistics={statistics!.statistics} />
-        <ChampionsSummarize champions={statistics!.champions} />
-        <GameplayOverview gameplayData={statistics!.gameplay} />
-        <ProPlayer />
-        <ImageCardSection>
-          <MostPlayedChampionsCard
-            playerName={`${accountData!.gameName}#${accountData!.tagLine}`}
-            champions={statistics!.champions}
-          />
-          <PlayerOverviewCard
-            playerName={`${accountData!.gameName}#${accountData!.tagLine}`}
-            statistics={statistics!.statistics}
-            roleDistribution={statistics!.gameplay.roleDistribution}
-          />
-          <PlayerComparisonCard />
-        </ImageCardSection>
-      </div>
-    </>
+        <PlayerOverviewCard
+          playerName={`${accountData!.gameName}#${accountData!.tagLine}`}
+          statistics={statistics!.statistics}
+          roleDistribution={statistics!.gameplay.roleDistribution}
+        />
+        <PlayerComparisonCard />
+      </ImageCardSection>
+    </div>
   );
 }
