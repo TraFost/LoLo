@@ -5,6 +5,10 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { AccountDTO } from 'shared/src/types/account.type';
 import type { ResponseWithData } from 'shared/src/types/response';
 
+interface AccountResponse extends AccountDTO {
+  profilePict: string;
+}
+
 export const fetchAccount = async ({
   gameName,
   tagName,
@@ -13,9 +17,9 @@ export const fetchAccount = async ({
   gameName: string;
   tagName: string;
   region: string;
-}): Promise<AccountDTO> => {
+}): Promise<AccountResponse> => {
   try {
-    const res = await axios.get<ResponseWithData<AccountDTO>>(
+    const res = await axios.get<ResponseWithData<AccountResponse>>(
       `http://localhost:3000/api/account/${gameName}/${tagName}`,
       {
         params: {
