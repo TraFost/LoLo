@@ -3,6 +3,7 @@ import { HomePage } from '@/features/home/pages/home.page';
 import { AnalyzePage } from '@/features/analyze/pages/analyze.page';
 import { SummarizePage } from '@/features/summarize/page/summarize.page';
 import { TeamPage } from '@/features/team/pages/team.page';
+import { NotFoundPage } from '@/features/not-found/pages/not-found.page';
 
 export interface Page {
   id: string;
@@ -29,6 +30,7 @@ const createRoute = (option: RouteObject): RouteObject => ({
 const router = createBrowserRouter([
   { path: '/', element: <Navigate to={DEFAULT_PATH} replace /> },
   ...PAGES.map((p) => createRoute(p)),
+  { path: '*', element: <NotFoundPage /> },
 ]);
 
 export function AppRouter() {
