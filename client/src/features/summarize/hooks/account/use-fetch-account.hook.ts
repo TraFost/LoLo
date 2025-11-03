@@ -20,7 +20,7 @@ export const fetchAccount = async ({
 }): Promise<AccountResponse> => {
   try {
     const res = await axios.get<ResponseWithData<AccountResponse>>(
-      `http://localhost:3000/api/account/${gameName}/${tagName}`,
+      `https://vncjbglssbpomo62pxk3rfkasu0ejovz.lambda-url.ap-southeast-1.on.aws/api/account/${gameName}/${tagName}`,
       {
         params: {
           region,
