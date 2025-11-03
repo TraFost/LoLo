@@ -2,7 +2,8 @@ import { useRef } from 'react';
 import { Button } from '@/ui/atoms/button.atom';
 import { HextechDivider } from '@/ui/atoms/hextech-divider';
 import { ChampionStats, RoleDistribution, StatisticItem } from 'shared/src/types/statistics.type';
-import { downloadToPng } from '../utils/download-to-png.util';
+import { downloadToPng } from '../utils/image-card/download-to-png.util';
+import { getChampionIdForDDragon } from '../utils/champion/parse-champion-name.util';
 
 const playerName = 'PitouNever#TOXIC';
 
@@ -63,14 +64,12 @@ export function MostPlayedChampionsCard({ playerName, champions }: MostPlayedCha
       sm: { img: 'h-[330px]', name: 'text-3xl', stat: 'text-sm', pad: 'py-4', overlay: 'pt-16' },
       lg: { img: 'h-[400px]', name: 'text-5xl', stat: 'text-base', pad: 'py-5', overlay: 'pt-20' },
     }[size];
+    const championId = getChampionIdForDDragon(champion.name);
 
     return (
       <div className="relative overflow-hidden bg-gray-900 border border-yellow-800/30">
         <img
-          src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champion.name.replace(
-            ' ',
-            '',
-          )}_0.jpg`}
+          src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championId}_0.jpg`}
           alt={champion.name}
           className={`object-cover w-full ${sizes.img}`}
         />
