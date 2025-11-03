@@ -16,7 +16,9 @@ export default $config({
       handler: 'server/src/lambda/index.handler',
       runtime: 'nodejs22.x',
       timeout: '30 seconds',
-      url: true,
+      url: {
+        cors: false,
+      },
       memory: '512 MB',
       permissions: [
         {
