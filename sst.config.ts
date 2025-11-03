@@ -15,14 +15,8 @@ export default $config({
     const apiFn = new sst.aws.Function('ApiFn', {
       handler: 'server/src/lambda/index.handler',
       runtime: 'nodejs22.x',
-      url: {
-        cors: {
-          allowOrigins: ['http://localhost:5173'],
-          allowMethods: ['POST', 'OPTIONS'],
-          allowHeaders: ['content-type', 'authorization'],
-        },
-      },
       timeout: '30 seconds',
+      url: true,
       memory: '512 MB',
       permissions: [
         {
