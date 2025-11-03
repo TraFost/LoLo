@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
+import ChartRadar from '@/ui/molecules/chart-radar.molecule';
 
 const playerAnalysis = [
   { label: 'Preferred Role', value: 'Mid Lane' },
@@ -40,13 +41,17 @@ export function ProPlayer() {
         initial={{ x: -500 }}
         whileInView={{ x: 0 }}
         viewport={{ once: true }}
-        transition={{
-          duration: 0.3,
-          ease: 'linear', // gerak lurus tanpa halus
-        }}
+        transition={{ duration: 0.3, ease: 'linear' }}
         className="flex flex-col justify-center items-center p-6 lg:pr-12"
       >
-        <div className="max-w-md text-center lg:text-left">
+        <motion.div
+          animate={status === 'revealed' ? { y: -20, opacity: 1 } : { y: 0, opacity: 1 }}
+          transition={{
+            duration: 0.6,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
+          className="max-w-md text-center lg:text-left"
+        >
           <h3 className="text-3xl lg:text-5xl font-bold text-white">LoLo#AI</h3>
           <p className="text-gray-300 text-base lg:text-lg mt-4 leading-relaxed mb-6">
             From your plays to your instincts, this is the essence of how you approach the game.
@@ -60,7 +65,22 @@ export function ProPlayer() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
+
+        {status === 'revealed' && (
+          <motion.div
+            initial={{ x: -500, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{
+              duration: 0.3,
+              ease: 'linear',
+              delay: 0.5,
+            }}
+            className="w-full"
+          >
+            <ChartRadar />
+          </motion.div>
+        )}
       </motion.div>
 
       {/* RIGHT - Comparison / Loading / Reveal */}
@@ -102,7 +122,7 @@ export function ProPlayer() {
               animate={{ opacity: 1, x: 0 }}
               transition={{
                 duration: 0.3,
-                ease: 'linear', // langsung, tanpa kurva halus
+                ease: 'linear',
               }}
               className="relative w-full max-w-2xl mx-auto"
             >

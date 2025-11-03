@@ -75,11 +75,12 @@ shared/
 
 ## Key Features
 
-- **Coach Persona:** Adaptive AI mentor that adjusts tone and focus with time.
-- **Pre Match Plan:** Builds a short strategic checklist from your past ten games.
-- **Post Match Debrief:** Extracts key behavioral patterns and one improvement habit.
-- **Season Arc Card:** JSON driven progress snapshot visualized in a compact summary UI.
-- **Calm Mascot, Poro:** Animated companion that represents composure and growth.
+- **Instant Account Lookup UI:** A responsive Tag Input flow that splits Riot ID + tagline, lets players pick a region, and calls the account service for profile data and splash art.
+- **Ranked Match Digest Cards:** Scroll-driven stat blocks highlight wins, kills, time played, pentas, and more, all powered by the statistics endpoint.
+- **Champion Mastery Spotlight:** Desktop and mobile layouts showcase the top champions with matches, win rate, and mastery pulled from Riot mastery APIs.
+- **Role Trend Dashboard:** Interactive charts focus on the player’s most played role, visualizing per-month KP, damage, CS, and vision metrics.
+- **Shareable Recap Cards:** Frontend exports polished overview, champion spotlight, and pro-comparison cards to PNG via `html-to-image`, so players can flex their progress anywhere.
+- **AI Improvement Endpoint:** Backend Bedrock Nova Micro JSON prompts package match timelines into strengths and improvement focuses, ready to surface in the Analyze experience.
 
 ---
 

@@ -5,6 +5,10 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { AccountDTO } from 'shared/src/types/account.type';
 import type { ResponseWithData } from 'shared/src/types/response';
 
+interface AccountResponse extends AccountDTO {
+  profilePict: string;
+}
+
 export const fetchAccount = async ({
   gameName,
   tagName,
@@ -13,10 +17,15 @@ export const fetchAccount = async ({
   gameName: string;
   tagName: string;
   region: string;
-}): Promise<AccountDTO> => {
+}): Promise<AccountResponse> => {
   try {
-    const res = await axios.get<ResponseWithData<AccountDTO>>(
-      `http://localhost:3000/api/account/${gameName}/${tagName}?region=${region}`,
+    const res = await axios.get<ResponseWithData<AccountResponse>>(
+      `https://vncjbglssbpomo62pxk3rfkasu0ejovz.lambda-url.ap-southeast-1.on.aws/api/account/${gameName}/${tagName}`,
+      {
+        params: {
+          region,
+        },
+      },
     );
     const response = res.data;
 
@@ -26,9 +35,9 @@ export const fetchAccount = async ({
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error('Axios error details: ', error.response?.data);
+      console.error('Axios error details: ', error);
 
-      const errorMessage: string = error.response?.data?.details.message;
+      const errorMessage: string = error.response?.data?.details.message || error.message;
 
       throw new Error(errorMessage);
     } else {

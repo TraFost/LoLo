@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { getChampionIdForDDragon } from '../utils/champion/parse-champion-name.util';
 
 interface Props {
   gameName: string;
@@ -8,23 +9,22 @@ interface Props {
 }
 
 export function RecapIntro({ gameName, tagName, championName, profilePict }: Props) {
+  const championId = getChampionIdForDDragon(championName);
+
   return (
     <section className="w-full h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
       <motion.div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: `url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName.replace(
-            /\s+/g,
-            '',
-          )}_0.jpg')`,
+          backgroundImage: `url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId}_0.jpg')`,
           maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
         }}
         initial={{ scale: 1.1, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 2, ease: 'easeOut' }}
-      ></motion.div>
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-transparent"></div>
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-transparent" />
 
       <motion.div
         className="flex flex-col gap-4 items-center z-10"

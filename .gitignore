@@ -46,3 +46,4 @@ sst-env.d.ts
 
 # Misc
 internal-docs
+.vercel

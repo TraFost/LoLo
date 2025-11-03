@@ -1,90 +1,36 @@
 import { useRef } from 'react';
-import { toPng } from 'html-to-image';
 import { Button } from '@/ui/atoms/button.atom';
-
-type Champion = { name: string; matches: number; wins: number; winrate: number };
-
-const champions: Champion[] = [
-  { name: 'Yuumi', matches: 543, wins: 30, winrate: 66.7 },
-  { name: 'Aatrox', matches: 346, wins: 30, winrate: 66.7 },
-  { name: 'Ahri', matches: 247, wins: 30, winrate: 66.7 },
-  { name: 'Jinx', matches: 215, wins: 30, winrate: 66.7 },
-  { name: 'Lee Sin', matches: 145, wins: 30, winrate: 66.7 },
-];
-
-const statistics = [
-  {
-    title: 'Total Games',
-    value: '98',
-    subtitle: 'Across all queues',
-  },
-  {
-    title: 'Win Rate',
-    value: '59.2%',
-    subtitle: 'Overall performance',
-  },
-  {
-    title: 'Total Kills',
-    value: '454',
-    subtitle: '4.6 per game',
-  },
-  {
-    title: 'Pentakills',
-    value: '0',
-    subtitle: 'Keep trying!',
-  },
-  {
-    title: 'Hours Played',
-    value: '49',
-    subtitle: "That's 2 days!",
-  },
-];
+import { HextechDivider } from '@/ui/atoms/hextech-divider';
+import { ChampionStats, RoleDistribution, StatisticItem } from 'shared/src/types/statistics.type';
+import { downloadToPng } from '../utils/image-card/download-to-png.util';
+import { getChampionIdForDDragon } from '../utils/champion/parse-champion-name.util';
 
 const playerName = 'PitouNever#TOXIC';
 
-const roleDistribution = [
-  { role: 'Mid', value: 85 },
-  { role: 'Jungle', value: 7 },
-  { role: 'Top', value: 4 },
-  { role: 'Support', value: 2 },
-];
-
-interface CardProps {
-  handleDownload: (ref: React.RefObject<HTMLDivElement | null>, name: string) => Promise<void>;
+interface Props {
+  children: React.ReactNode;
 }
 
-export function ImageCard() {
-  const handleDownload = async (ref: React.RefObject<HTMLDivElement | null>, name: string) => {
-    if (!ref.current) return;
-    const dataUrl = await toPng(ref.current, { cacheBust: true });
-    const link = document.createElement('a');
-    link.download = `${name}.png`;
-    link.href = dataUrl;
-    link.click();
-  };
+interface PlayerOverviewProps {
+  playerName: string;
+  statistics: StatisticItem[];
+  roleDistribution: RoleDistribution[];
+}
 
+interface MostPlayedChampionsProps {
+  playerName: string;
+  champions: ChampionStats[];
+}
+
+export function ImageCardSection({ children }: Props) {
   return (
     <div>
-      <div className="scale-[0.6] flex gap-24">
-        <PlayerOverviewCard handleDownload={handleDownload} />
-        <MostPlayedChampions handleDownload={handleDownload} />
-        <PlayerComparisonCard handleDownload={handleDownload} />
-      </div>
+      <div className="scale-[0.6] flex gap-24">{children}</div>
     </div>
   );
 }
 
-function HextechDivider() {
-  return (
-    <div className="w-[300px] flex items-center justify-center" aria-hidden="true">
-      <div className="h-[1px] w-full bg-gradient-to-l from-yellow-600/80 via-yellow-400/30 to-transparent" />
-      <div className="w-3 h-3 rotate-45 border border-yellow-600/80 mx-2" />
-      <div className="h-[1px] w-full bg-gradient-to-r from-yellow-600/80 via-yellow-400/30 to-transparent" />
-    </div>
-  );
-}
-
-function MostPlayedChampions({ handleDownload }: CardProps) {
+export function MostPlayedChampionsCard({ playerName, champions }: MostPlayedChampionsProps) {
   const ref = useRef<HTMLDivElement>(null);
   const bgImageUrl = '/assets/background/Demacia_City.jpg';
 
@@ -107,19 +53,23 @@ function MostPlayedChampions({ handleDownload }: CardProps) {
     );
   }
 
-  function ChampionCard({ champion, size = 'sm' }: { champion: Champion; size?: 'lg' | 'sm' }) {
+  function ChampionCard({
+    champion,
+    size = 'sm',
+  }: {
+    champion: ChampionStats;
+    size?: 'lg' | 'sm';
+  }) {
     const sizes = {
       sm: { img: 'h-[330px]', name: 'text-3xl', stat: 'text-sm', pad: 'py-4', overlay: 'pt-16' },
       lg: { img: 'h-[400px]', name: 'text-5xl', stat: 'text-base', pad: 'py-5', overlay: 'pt-20' },
     }[size];
+    const championId = getChampionIdForDDragon(champion.name);
 
     return (
       <div className="relative overflow-hidden bg-gray-900 border border-yellow-800/30">
         <img
-          src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champion.name.replace(
-            ' ',
-            '',
-          )}_0.jpg`}
+          src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championId}_0.jpg`}
           alt={champion.name}
           className={`object-cover w-full ${sizes.img}`}
         />
@@ -133,12 +83,12 @@ function MostPlayedChampions({ handleDownload }: CardProps) {
             </p>
 
             {/* Stats */}
-            <div className={`flex justify-between w-full px-4 text-center ${sizes.stat} space-x-2`}>
+            <div className={`flex justify-between w-full px-1 text-center ${sizes.stat} space-x-2`}>
               <Stat label="MATCHES" value={champion.matches} highlight={false} />
               <Stat label="WINS" value={champion.wins} highlight={false} />
               <Stat
                 label="WINRATE"
-                value={`${champion.winrate}%`}
+                value={`${champion.winrate.toFixed(1)}%`}
                 highlight={champion.winrate >= 50}
               />
             </div>
@@ -203,7 +153,7 @@ function MostPlayedChampions({ handleDownload }: CardProps) {
         size="lg"
         variant="flat"
         className="scale-150 mt-8"
-        onClick={() => handleDownload(ref, 'LoLo - Most Champions Played')}
+        onClick={() => downloadToPng(ref, 'LoLo - Most Champions Played')}
       >
         Download
       </Button>
@@ -211,7 +161,11 @@ function MostPlayedChampions({ handleDownload }: CardProps) {
   );
 }
 
-function PlayerOverviewCard({ handleDownload }: CardProps) {
+export function PlayerOverviewCard({
+  playerName,
+  statistics,
+  roleDistribution,
+}: PlayerOverviewProps) {
   const ref = useRef(null);
   const bgImageUrl = '/assets/background/Shurima.png';
 
@@ -307,7 +261,7 @@ function PlayerOverviewCard({ handleDownload }: CardProps) {
         size="lg"
         variant="flat"
         className="scale-150 mt-8"
-        onClick={() => handleDownload(ref, 'LoLo - Player Overview')}
+        onClick={() => downloadToPng(ref, 'LoLo - Player Overview')}
       >
         Download
       </Button>
@@ -335,7 +289,7 @@ const proPlayer = {
     'Your play embodies controlled precision much like Faker. You manage risk with intelligence and let fundamentals carry your advantage. Both of you turn small wins into complete dominance.',
 };
 
-function PlayerComparisonCard({ handleDownload }: CardProps) {
+export function PlayerComparisonCard() {
   const ref = useRef(null);
   const bgImageUrl = '/assets/background/Poro_King.jpg';
   const proPlayerImageUrl =
@@ -452,7 +406,7 @@ function PlayerComparisonCard({ handleDownload }: CardProps) {
         size="lg"
         variant="flat"
         className="scale-150 mt-8"
-        onClick={() => handleDownload(ref, 'LoLo - Pro Player Analysis')}
+        onClick={() => downloadToPng(ref, 'LoLo - Pro Player Analysis')}
       >
         Download
       </Button>

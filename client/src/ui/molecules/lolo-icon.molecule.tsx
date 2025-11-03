@@ -22,7 +22,7 @@ export default function LoloIcon({
         ? {
             duration: 8,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: 'easeInOut' as const,
           }
         : undefined,
     },
@@ -32,7 +32,7 @@ export default function LoloIcon({
         ? {
             duration: 2,
             repeat: Infinity,
-            ease: 'linear',
+            ease: 'linear' as const,
           }
         : undefined,
     },
@@ -50,7 +50,7 @@ export default function LoloIcon({
         ? {
             duration: 6.4,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: 'easeInOut' as const,
           }
         : undefined,
     },
@@ -64,7 +64,7 @@ export default function LoloIcon({
         ? {
             duration: 1.5,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: 'easeInOut' as const,
           }
         : undefined,
     },

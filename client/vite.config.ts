@@ -14,4 +14,8 @@ export default defineConfig({
     },
   },
   envDir: '.env',
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+  },
 });

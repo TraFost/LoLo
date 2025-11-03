@@ -23,7 +23,7 @@ export function Footer() {
         </div>
 
         <ul className="flex gap-5">
-          {PAGES.slice(1).map((page) => (
+          {PAGES.slice(2).map((page) => (
             <li key={page.id}>
               <a className="hover:text-primary transition-colors" href={page.path}>
                 {page.label}

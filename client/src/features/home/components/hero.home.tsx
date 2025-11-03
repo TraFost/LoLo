@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { Button } from '@/ui/atoms/button.atom';
 import { Description } from '@/ui/atoms/typography/description.atom';
 
-import { createStaggerContainer, fadeIn, fadeInUp, scaleIn } from '@/lib/utils/motion.util';
+import { createStaggerContainer, fadeIn, fadeInUp } from '@/lib/utils/motion.util';
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 
 const heroContainer = createStaggerContainer(0.15, 0.12);

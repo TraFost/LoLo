@@ -6,7 +6,7 @@ import { useFetchAccount } from '../account/use-fetch-account.hook';
 
 const fetchStatistics = async (puuid: string, region: string): Promise<StatisticsResponse> => {
   const res = await axios.get<ResponseWithData<StatisticsResponse>>(
-    `http://localhost:3000/api/statistics/${puuid}`,
+    `https://vncjbglssbpomo62pxk3rfkasu0ejovz.lambda-url.ap-southeast-1.on.aws/api/statistics/${puuid}`,
     { params: { region } },
   );
 

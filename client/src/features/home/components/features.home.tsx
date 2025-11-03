@@ -9,7 +9,7 @@ import { createStaggerContainer, fadeInUp, fadeIn, scaleIn } from '@/lib/utils/m
 
 const featuresContainer = createStaggerContainer(0.05, 0.15);
 
-export const FEATURES = [
+const FEATURES = [
   {
     icon: <LineChart className="w-6 h-6" />,
     title: 'Season Arc Card',

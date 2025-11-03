@@ -2,4 +2,7 @@ import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 
 import { ENV } from './env.config';
 
-export const bedrock = new BedrockRuntimeClient({ region: ENV.aws.region });
+export const bedrock = new BedrockRuntimeClient({
+  region: ENV.aws.region,
+  endpoint: 'https://bedrock-runtime.ap-southeast-1.amazonaws.com',
+});

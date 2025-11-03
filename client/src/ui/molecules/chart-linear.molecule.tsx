@@ -5,14 +5,14 @@ import { ChartContainer, ChartTooltip } from '@/ui/atoms/chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/atoms/select';
 import { useState } from 'react';
 import { RoleChartStatistics } from 'shared/src/types/statistics.type';
-import { chartHelper } from '@/features/summarize/utils/chart-config.util';
+import { chartHelper } from '@/features/summarize/utils/chart/chart-config.util';
 
 type Props = {
   chartStatistics: RoleChartStatistics;
 };
 
 export function ChartAreaLinear({ chartStatistics }: Props) {
-  const { metrics, role } = chartStatistics;
+  const { metrics } = chartStatistics;
   const { chartConfig, options } = chartHelper(metrics);
   const [selectedOption, setSelectedOption] = useState(options[0]);
 
