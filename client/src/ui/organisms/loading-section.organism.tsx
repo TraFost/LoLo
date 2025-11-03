@@ -1,16 +1,7 @@
 import { useEffect, useState } from 'react';
 import LoloIcon from '../molecules/lolo-icon.molecule';
 import { AnimatePresence, motion } from 'motion/react';
-
-function HextechDivider() {
-  return (
-    <div className="w-[200px] flex items-center justify-center my-6" aria-hidden="true">
-      <div className="h-[1px] w-full bg-gradient-to-l from-yellow-600/80 via-yellow-400/30 to-transparent" />
-      <div className="w-2.5 h-2.5 rotate-45 border border-yellow-600/80 mx-2" />
-      <div className="h-[1px] w-full bg-gradient-to-r from-yellow-600/80 via-yellow-400/30 to-transparent" />
-    </div>
-  );
-}
+import { HextechDivider } from '../atoms/hextech-divider';
 
 const loadingMessages = [
   'Calculating your KDA...',
