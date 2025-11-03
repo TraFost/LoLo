@@ -74,7 +74,7 @@ export function ProPlayer() {
             transition={{
               duration: 0.3,
               ease: 'linear',
-              delay: 0.4,
+              delay: 0.5,
             }}
             className="w-full"
           >
