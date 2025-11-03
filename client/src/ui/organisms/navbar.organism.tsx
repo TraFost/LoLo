@@ -29,7 +29,7 @@ export function MainNavbar() {
       <Navbar>
         <NavBody>
           <NavbarLogo />
-          <NavItems items={PAGES.slice(1)} />
+          <NavItems items={PAGES.slice(2)} />
           <div className="flex items-center gap-4">
             <Button
               variant="flat"
@@ -53,7 +53,7 @@ export function MainNavbar() {
           </MobileNavHeader>
 
           <MobileNavMenu isOpen={isMobileMenuOpen}>
-            {PAGES.slice(1).map((item) => (
+            {PAGES.slice(2).map((item) => (
               <a
                 key={`mobile-link-${item.id}`}
                 href={item.path}

@@ -13,8 +13,8 @@ export interface Page {
 
 export const PAGES: Page[] = [
   { id: 'home', label: 'Home', path: '/home', element: <HomePage /> },
-  { id: 'analyze', label: 'Analyze', path: '/analyze', element: <AnalyzePage /> },
   { id: 'summarize', label: 'Summarize', path: '/summarize', element: <SummarizePage /> },
+  { id: 'analyze', label: 'Analyze', path: '/analyze', element: <AnalyzePage /> },
   { id: 'team', label: 'Team', path: '/team', element: <TeamPage /> },
 ] as const;
 
