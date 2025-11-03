@@ -15,7 +15,7 @@ export default $config({
     const apiFn = new sst.aws.Function('ApiFn', {
       handler: 'server/src/lambda/index.handler',
       runtime: 'nodejs22.x',
-      timeout: '30 seconds',
+      timeout: '60 seconds',
       url: {
         cors: false,
       },
@@ -24,7 +24,8 @@ export default $config({
         {
           actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
           resources: [
-            'arn:aws:bedrock:ap-southeast-1::foundation-model/apac.amazon.nova-micro-v1:0',
+            'arn:aws:bedrock:ap-southeast-1:097677866265:inference-profile/apac.amazon.nova-micro-v1:0',
+            'arn:aws:bedrock:ap-southeast-1::foundation-model/amazon.nova-micro-v1:0',
           ],
         },
       ],
