@@ -3,6 +3,9 @@ import type { MatchDTO, ParticipantDTO } from 'shared/src/types/statistics.type'
 import type { HttpInstance } from 'shared/src/lib/axios';
 import type { PlatformRegion } from 'shared/src/types/account.type';
 
+import { PlayerAnalystAgent } from '../agents/player-analyst.agent';
+import { ProComparisonAgent } from '../agents/pro-comparison.agent';
+import type { AnalysisDTO, ProComparisonDTO } from 'shared/src/types/analyze.dto';
 import { normalizeRole } from '../lib/utils/helper.util';
 import { createRegionalClient } from '../lib/utils/riot.util';
 
@@ -11,6 +14,26 @@ export class AnalyzeService {
 
   constructor(platformRegion: PlatformRegion) {
     this.regionalClient = createRegionalClient(platformRegion);
+  }
+
+  async generateImprovementReport(puuid: string): Promise<AnalysisDTO> {
+    const { role, matchData } = await this.getImprovementAnalysis(puuid);
+    const analyst = new PlayerAnalystAgent();
+    return analyst.run({ role, matchData });
+  }
+
+  async generateProComparison(puuid: string): Promise<ProComparisonDTO> {
+    const { role, matchData } = await this.getImprovementAnalysis(puuid);
+    const analyst = new PlayerAnalystAgent();
+    const playerAnalysis = await analyst.run({ role, matchData });
+
+    const comparisonAgent = new ProComparisonAgent(analyst);
+
+    return comparisonAgent.run({
+      role,
+      matchData,
+      playerAnalysis,
+    });
   }
 
   async getImprovementAnalysis(puuid: string): Promise<{ role: string; matchData: any[] }> {
