@@ -31,9 +31,14 @@ export function SummarizePage() {
   return (
     <RenderState
       isRedirecting={isMissingParams}
-      isLoading={isAccountLoading || isLoading}
+      isAccountLoading={isAccountLoading}
+      isLoading={isLoading}
       isError={isAccountError || isError}
-      error={accountError?.message || error?.message}
+      error={
+        typeof accountError === 'object'
+          ? accountError?.message
+          : accountError || (typeof error === 'object' ? error?.message : error)
+      }
     >
       {accountData && statistics ? (
         <div className="flex flex-col items-center bg-gray-950 text-white">

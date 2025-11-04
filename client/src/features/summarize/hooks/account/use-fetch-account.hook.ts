@@ -34,16 +34,19 @@ export const fetchAccount = async ({
     }
     return response.data;
   } catch (error) {
+    let errorMessage = 'An unknown error occurred';
+
     if (axios.isAxiosError(error)) {
-      console.error('Axios error details: ', error);
-
-      const errorMessage: string = error.response?.data?.details.message || error.message;
-
-      throw new Error(errorMessage);
-    } else {
-      console.error('An unexpected error occurred: ', error);
-      throw new Error('An unexpected error occurred');
+      errorMessage =
+        error.response?.data?.details?.message ||
+        error.response?.data?.message ||
+        error.message ||
+        'An Axios error occurred';
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
     }
+
+    throw new Error(errorMessage);
   }
 };
 
