@@ -61,7 +61,6 @@ export function buildUserPrompt(role: string, matchData: any[]): string {
       const totalCs = (p.totalMinionsKilled ?? 0) + (p.neutralMinionsKilled ?? 0);
 
       return [
-        // keep the index for model structure, but we tell it not to TELL the user
         `match: ${i + 1}`,
         `win: ${p.win ? 'true' : 'false'}`,
         `lane: ${p.teamPosition || p.individualPosition || 'UNKNOWN'}`,
@@ -81,7 +80,6 @@ export function buildUserPrompt(role: string, matchData: any[]): string {
   return (
     `PLAYER CONTEXT\n` +
     `role: ${role}\n` +
-    // don't give a concrete number
     `sample_size: multiple recent ranked games (do NOT repeat this as a number)\n` +
     `---\n` +
     `MATCHES (one per line, machine-readable):\n` +
@@ -94,7 +92,7 @@ export function buildUserPrompt(role: string, matchData: any[]): string {
     `OUTPUT FORMAT (STRICT):\n` +
     `{\n` +
     `  "analysis": {\n` +
-    `    "overall": "1-3 sentences, qualitative, no exact game counts, no patch mentions unless clearly relevant",\n` +
+    `    "overall": "1-3 sentences, qualitative, no exact game counts, no PATCH mentions",\n` +
     `    "strengths": ["1-8 items, 1-2 sentences each, qualitative only"],\n` +
     `    "improvement": ["1-8 items, 1-2 sentences each, qualitative only"]\n` +
     `  }\n` +
@@ -110,4 +108,124 @@ export function buildUserPrompt(role: string, matchData: any[]): string {
     `- If role is solo lane/ADC, be strict on CS and sustained damage.\n` +
     `- If data is thin or noisy, state uncertainty explicitly in "overall" without giving the exact number of games.`
   );
+}
+
+export function buildProSelectorSystemPrompt(): string {
+  return `You choose the best reference pro from a provided list.
+You MUST output ONLY valid JSON:
+
+{
+"chosen_pro_id": "string",
+"reason": "string, 1-2 sentences, grounded in provided metrics",
+"alternatives": ["string"]
+}
+
+Rules:
+
+Prefer same role as the player.
+
+Prefer pros whose metrics are slightly better than the player's (not extreme outliers), to create a realistic improvement target.
+
+Choose only from the provided candidate ids. Do not invent ids.
+
+No markdown. No extra keys.`;
+}
+
+export function buildProSelectorUserPrompt(playerSig: any, proSigs: any[]): string {
+  return [
+    'PLAYER_SIGNATURE:',
+    JSON.stringify(playerSig),
+    'CANDIDATE_PROS:',
+    JSON.stringify(proSigs),
+    'TASK:',
+    'Pick exactly one "id" from CANDIDATE_PROS as "chosen_pro_id" and explain briefly why in "reason".',
+  ].join('\n');
+}
+
+export interface ComparisonPromptInput {
+  role: string;
+  roleDisplay: string;
+  proName: string;
+  selectorReason?: string;
+  playerAnalysis: any;
+  proAnalysis: any;
+  playerSignature: any;
+  proSignature?: any;
+}
+
+export function buildComparisonSystemPrompt(): string {
+  return `You transform two analyses (player vs. pro) into a concise comparison summary.
+You MUST output ONLY valid JSON and follow this schema exactly:
+
+{
+  "playerAnalysis": [
+    { "label": "string", "value": "string" }
+  ],
+  "proPlayer": {
+    "name": "string",
+    "role": "string",
+    "playstyle": "string",
+    "similarities": ["string"],
+    "playstyleDetails": ["string"],
+    "summary": "string"
+  },
+  "comparisonChart": [
+    { "stat": "string", "player": number, "proPlayer": number }
+  ]
+}
+
+Rules:
+- Use ONLY the provided analyses and signatures. Do NOT invent champions, ranks, or raw stats.
+- "playerAnalysis" must contain exactly four items with labels, in order: "Preferred Role", "Playstyle", "Team Impact", "Decision Tempo". Values must be qualitative (no numbers) and 1-2 sentences.
+- "proPlayer.name" and "proPlayer.role" must match the provided values. Keep "playstyleDetails" as exactly two sentences (two array entries).
+- "proPlayer.similarities" must include 2-3 short phrases showing shared strengths.
+- "comparisonChart" must contain exactly five objects in this order: Fighting, Farming, Supporting, Pushing, Versatility. Scores are integers between 0 and 100 (no decimals) and should reflect relative performance based on the analyses and signatures.
+- Keep tone encouraging, actionable, and role-aware.
+- Output one JSON object, no markdown, no comments, no extra keys.`;
+}
+
+export function buildComparisonUserPrompt(payload: ComparisonPromptInput): string {
+  const sections = [
+    `ROLE_INTERNAL: ${payload.role}`,
+    `ROLE_DISPLAY: ${payload.roleDisplay}`,
+    `PRO_NAME: ${payload.proName}`,
+  ];
+
+  if (payload.selectorReason) {
+    sections.push(`PRO_SELECTION_REASON: ${payload.selectorReason}`);
+  }
+
+  sections.push('PLAYER_ANALYSIS_JSON:');
+  sections.push(JSON.stringify(payload.playerAnalysis));
+  sections.push('PRO_ANALYSIS_JSON:');
+  sections.push(JSON.stringify(payload.proAnalysis));
+  sections.push('PLAYER_SIGNATURE:');
+  sections.push(JSON.stringify(payload.playerSignature));
+
+  if (payload.proSignature) {
+    sections.push('PRO_SIGNATURE:');
+    sections.push(JSON.stringify(payload.proSignature));
+  }
+
+  sections.push('OUTPUT_EXPECTATIONS:');
+  sections.push(
+    JSON.stringify({
+      playerAnalysisLabels: ['Preferred Role', 'Playstyle', 'Team Impact', 'Decision Tempo'],
+      chartStats: ['Fighting', 'Farming', 'Supporting', 'Pushing', 'Versatility'],
+      statGuidance: {
+        Fighting: 'kills, skirmish success, duel readiness, risk appetite',
+        Farming: 'CS consistency, resource control, tempo farming',
+        Supporting: 'vision, assists, utility for team',
+        Pushing: 'objective pressure, tower control, macro pacing',
+        Versatility: 'adaptability, picks, ability to shift styles',
+      },
+    }),
+  );
+
+  sections.push('TASK:');
+  sections.push(
+    'Craft the JSON summary with qualitative insights that align with the provided analyses and signatures. Scores must feel consistent with the narrative.',
+  );
+
+  return sections.join('\n');
 }
