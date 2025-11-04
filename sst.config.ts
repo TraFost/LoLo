@@ -12,10 +12,13 @@ export default $config({
     const envFile = path.join(process.cwd(), 'server', '.env');
     const parsed = fs.existsSync(envFile) ? dotenv.parse(fs.readFileSync(envFile, 'utf8')) : {};
 
+    const bucket = new sst.aws.Bucket('storage');
+
     const apiFn = new sst.aws.Function('ApiFn', {
       handler: 'server/src/lambda/index.handler',
       runtime: 'nodejs22.x',
       timeout: '60 seconds',
+      link: [bucket],
       url: {
         cors: false,
       },
@@ -52,3 +55,10 @@ export default $config({
     return { ApiUrl: apiFn.url };
   },
 });
+
+// # Available Buckets
+
+//     1. pro-player-stats
+//     2. player-statistics
+//     3. player-comparisons-pro
+//     4. player-improvements
