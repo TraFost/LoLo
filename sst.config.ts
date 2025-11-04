@@ -55,10 +55,3 @@ export default $config({
     return { ApiUrl: apiFn.url };
   },
 });
-
-// # Available Buckets
-
-//     1. pro-player-stats
-//     2. player-statistics
-//     3. player-comparisons-pro
-//     4. player-improvements
