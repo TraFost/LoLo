@@ -9,7 +9,7 @@ export function createRegionalClient(
   retries: number = 2,
 ): HttpInstance {
   const key = platformRegion.toLowerCase().trim();
-  const regional = REGION_MAP[key] ?? (['kr', 'jp1'].includes(key) ? 'asia' : 'americas');
+  const regional = (REGION_MAP as any)[key] ?? (['kr', 'jp1'].includes(key) ? 'asia' : 'americas');
 
   return createHttpClient({
     baseURL: `https://${regional}.api.riotgames.com`,
