@@ -24,11 +24,48 @@ app.get('/:gameName/:tagLine', zValidator('param', accountSchema), async (c) => 
   const accountService = new AccountService(platformRegion as PlatformRegion);
 
   try {
-    const data = await accountService.getAccountByRiotId({ gameName, tagLine });
-    const profilePict = await accountService.getAccountPict(data.puuid);
+    const cached = await accountService.getCachedAccount(gameName, tagLine);
+
+    if (cached) {
+      return c.json(
+        successWithData('LoL Account Fetched!', {
+          ...cached.account,
+          profilePict: cached.profilePict,
+          rank: cached.rank ?? null,
+          summonerLevel: cached.summoner.summonerLevel,
+        }),
+        StatusCodes.OK,
+      );
+    }
+
+    const account = await accountService.getAccountByRiotId({ gameName, tagLine });
+    const [{ summoner, profilePict }, rankEntries] = await Promise.all([
+      accountService.getAccountProfile(account.puuid),
+      accountService.getLeagueEntries(account.puuid),
+    ]);
+
+    const rank = accountService.selectPrimaryRank(rankEntries);
+
+    try {
+      await accountService.saveAccountSnapshot({
+        region: platformRegion as PlatformRegion,
+        account,
+        summoner,
+        profilePict,
+        rankEntries,
+        rank,
+      });
+    } catch (snapshotErr) {
+      console.error('Failed to persist account snapshot', snapshotErr);
+    }
 
     return c.json(
-      successWithData('LoL Account Fetched!', { ...data, profilePict }),
+      successWithData('LoL Account Fetched!', {
+        ...account,
+        profilePict,
+        rank,
+        summonerLevel: summoner.summonerLevel,
+      }),
       StatusCodes.OK,
     );
   } catch (err: any) {
