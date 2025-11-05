@@ -28,8 +28,35 @@ export interface AccountDTO {
 }
 
 export interface SummonerDTO {
+  id: string;
+  accountId: string;
+  puuid: string;
+  name: string;
   profileIconId: number;
   revisionDate: number;
-  puuid: string;
-  summonerLevel: string;
+  summonerLevel: number;
+}
+
+export interface LeagueEntryDTO {
+  leagueId: string;
+  queueType: string;
+  tier: string;
+  rank: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  veteran: boolean;
+  inactive: boolean;
+  freshBlood: boolean;
+  hotStreak: boolean;
+}
+
+export interface RankSummaryDTO {
+  queueType: string;
+  tier: string;
+  division: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  display: string;
 }

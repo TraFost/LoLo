@@ -1,25 +1,46 @@
 import { RANKED_MATCH } from 'shared/src/constants/match.constant';
 import type { MatchDTO, ParticipantDTO } from 'shared/src/types/statistics.type';
 import type { HttpInstance } from 'shared/src/lib/axios';
-import type { PlatformRegion } from 'shared/src/types/account.type';
+import type { PlatformRegion, RankSummaryDTO } from 'shared/src/types/account.type';
 
 import { PlayerAnalystAgent } from '../agents/player-analyst.agent';
 import { ProComparisonAgent } from '../agents/pro-comparison.agent';
-import type { AnalysisDTO, ProComparisonDTO } from 'shared/src/types/analyze.dto';
+import { PracticePlanAgent } from '../agents/practice-plan.agent';
+import { AccountService } from './account.service';
+import type {
+  AnalysisDTO,
+  ImprovementResponseDTO,
+  ProComparisonDTO,
+} from 'shared/src/types/analyze.dto';
 import { normalizeRole } from '../lib/utils/helper.util';
 import { createRegionalClient } from '../lib/utils/riot.util';
 
 export class AnalyzeService {
   private regionalClient: HttpInstance;
+  private readonly accountService: AccountService;
 
   constructor(platformRegion: PlatformRegion) {
     this.regionalClient = createRegionalClient(platformRegion);
+    this.accountService = new AccountService(platformRegion);
   }
 
-  async generateImprovementReport(puuid: string): Promise<AnalysisDTO> {
-    const { role, matchData } = await this.getImprovementAnalysis(puuid);
+  async generateImprovementReport(puuid: string): Promise<ImprovementResponseDTO> {
+    const { role, matchData, rank } = await this.getImprovementAnalysis(puuid);
     const analyst = new PlayerAnalystAgent();
-    return analyst.run({ role, matchData });
+    const analysis = await analyst.run({ role, matchData });
+
+    const practiceAgent = new PracticePlanAgent();
+    const practicePlan = await practiceAgent.run({
+      role,
+      analysis,
+      matchCount: matchData.length,
+      rank,
+    });
+
+    return {
+      analysis,
+      practicePlan,
+    };
   }
 
   async generateProComparison(puuid: string): Promise<ProComparisonDTO> {
@@ -36,7 +57,11 @@ export class AnalyzeService {
     });
   }
 
-  async getImprovementAnalysis(puuid: string): Promise<{ role: string; matchData: any[] }> {
+  async getImprovementAnalysis(puuid: string): Promise<{
+    role: string;
+    matchData: any[];
+    rank?: string;
+  }> {
     const matchIds = await this.getMatchIds(puuid);
     const matches = await this.getMatchDetails(matchIds);
 
@@ -45,6 +70,8 @@ export class AnalyzeService {
     if (playerMatches.length < 5) {
       throw new Error('Not enough matches');
     }
+
+    const rankSummary = await this.getPlayerRank(puuid);
 
     const roleCounts = new Map<string, number>();
     for (const p of playerMatches) {
@@ -66,7 +93,18 @@ export class AnalyzeService {
       }
     }
 
-    return { role, matchData };
+    return { role, matchData, rank: rankSummary?.display };
+  }
+
+  private async getPlayerRank(puuid: string): Promise<RankSummaryDTO | null> {
+    try {
+      const summoner = await this.accountService.getSummonerByPuuid(puuid);
+      const entries = await this.accountService.getLeagueEntries(summoner.id);
+      return this.accountService.selectPrimaryRank(entries);
+    } catch (error) {
+      console.warn('Failed to retrieve player rank', error);
+      return null;
+    }
   }
 
   private async getMatchIds(puuid: string): Promise<string[]> {
