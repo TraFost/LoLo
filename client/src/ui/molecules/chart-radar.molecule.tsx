@@ -7,19 +7,30 @@ import {
   ResponsiveContainer,
   Tooltip,
   TooltipProps,
+  PolarRadiusAxis,
 } from 'recharts';
+import { ComparisonChartEntryDTO } from 'shared/src/types/analyze.dto';
 
-const data = [
-  { stat: 'Fighting', player: 85, proPlayer: 65 },
-  { stat: 'Farming', player: 70, proPlayer: 90 },
-  { stat: 'Supporting', player: 90, proPlayer: 75 },
-  { stat: 'Pushing', player: 60, proPlayer: 80 },
-  { stat: 'Versatility', player: 80, proPlayer: 85 },
-];
+interface Props {
+  data: ComparisonChartEntryDTO[];
+  playerName: string;
+  proPlayerName: string;
+}
 
-export default function ChartRadar() {
+export default function ChartRadar({ data, playerName, proPlayerName }: Props) {
   const [showPlayer, setShowPlayer] = useState(true);
   const [showProPlayer, setShowProPlayer] = useState(true);
+
+  // Prevent both from being false
+  const handlePlayerToggle = () => {
+    if (!showProPlayer) return; // Prevent turning off both
+    setShowPlayer(!showPlayer);
+  };
+
+  const handleProPlayerToggle = () => {
+    if (!showPlayer) return; // Prevent turning off both
+    setShowProPlayer(!showProPlayer);
+  };
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
@@ -31,10 +42,11 @@ export default function ChartRadar() {
               dataKey="stat"
               tick={{ fill: '#fff', fontSize: '0.9rem', fontWeight: 600 }}
             />
+            <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
 
             {showPlayer && (
               <Radar
-                name="Player Stats"
+                name={playerName}
                 dataKey="player"
                 stroke="#38bdf8"
                 fill="#38bdf8"
@@ -43,7 +55,7 @@ export default function ChartRadar() {
             )}
             {showProPlayer && (
               <Radar
-                name="Pro Player Stats"
+                name={proPlayerName}
                 dataKey="proPlayer"
                 stroke="#f87171"
                 fill="#f87171"
@@ -60,7 +72,7 @@ export default function ChartRadar() {
           <input
             type="checkbox"
             checked={showPlayer}
-            onChange={() => setShowPlayer(!showPlayer)}
+            onChange={handlePlayerToggle}
             className="accent-cyan-400 w-4 h-4"
           />
           <span className="text-cyan-400 font-medium">Player Stats</span>
@@ -70,7 +82,7 @@ export default function ChartRadar() {
           <input
             type="checkbox"
             checked={showProPlayer}
-            onChange={() => setShowProPlayer(!showProPlayer)}
+            onChange={handleProPlayerToggle}
             className="accent-rose-400 w-4 h-4"
           />
           <span className="text-rose-400 font-medium">Pro Player Stats</span>
