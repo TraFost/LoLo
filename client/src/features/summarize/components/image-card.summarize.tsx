@@ -275,26 +275,6 @@ export function PlayerOverviewCard({
   );
 }
 
-const playerAnalysis = [
-  { label: 'Preferred Role', value: 'Mid Lane' },
-  { label: 'Playstyle', value: 'Calculated & Reactive' },
-  { label: 'Team Impact', value: 'Consistent Lead Builder' },
-  { label: 'Decision Tempo', value: 'Measured, rarely rushed' },
-];
-
-const proPlayer = {
-  name: 'Faker',
-  role: 'Mid Lane',
-  playstyle: 'Controlled Aggression',
-  similarities: ['Lane Dominance', 'Map Awareness', 'Tempo Control', 'Calculated Risk'],
-  playstyleDetails: [
-    'You maintain lane pressure with composure and rarely overcommit. You rely on consistent trades, wave control, and vision timing rather than raw aggression.',
-    'When opportunities arise, you act decisively but only when your setup ensures advantage. You play like a strategist, not a gambler.',
-  ],
-  summary:
-    'Your play embodies controlled precision much like Faker. You manage risk with intelligence and let fundamentals carry your advantage. Both of you turn small wins into complete dominance.',
-};
-
 export function PlayerComparisonCard({ playerName, comparison }: PlayerComparisonProps) {
   const { playerAnalysis, proPlayer } = comparison;
 
