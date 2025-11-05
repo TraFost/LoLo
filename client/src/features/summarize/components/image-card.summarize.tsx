@@ -4,22 +4,28 @@ import { HextechDivider } from '@/ui/atoms/hextech-divider';
 import { ChampionStats, RoleDistribution, StatisticItem } from 'shared/src/types/statistics.type';
 import { downloadToPng } from '../utils/image-card/download-to-png.util';
 import { getChampionIdForDDragon } from '../utils/champion/parse-champion-name.util';
-
-const playerName = 'PitouNever#TOXIC';
+import { ProComparisonDTO } from 'shared/src/types/analyze.dto';
 
 interface Props {
   children: React.ReactNode;
 }
 
-interface PlayerOverviewProps {
+interface CardProps {
   playerName: string;
+}
+
+interface PlayerOverviewProps extends CardProps {
   statistics: StatisticItem[];
   roleDistribution: RoleDistribution[];
 }
 
-interface MostPlayedChampionsProps {
+interface MostPlayedChampionsProps extends CardProps {
   playerName: string;
   champions: ChampionStats[];
+}
+
+interface PlayerComparisonProps extends CardProps {
+  comparison: ProComparisonDTO;
 }
 
 export function ImageCardSection({ children }: Props) {
@@ -289,7 +295,9 @@ const proPlayer = {
     'Your play embodies controlled precision much like Faker. You manage risk with intelligence and let fundamentals carry your advantage. Both of you turn small wins into complete dominance.',
 };
 
-export function PlayerComparisonCard() {
+export function PlayerComparisonCard({ playerName, comparison }: PlayerComparisonProps) {
+  const { playerAnalysis, proPlayer } = comparison;
+
   const ref = useRef(null);
   const bgImageUrl = '/assets/background/Poro_King.jpg';
   const proPlayerImageUrl =
@@ -311,20 +319,13 @@ export function PlayerComparisonCard() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/90" />
           <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 via-transparent to-transparent opacity-40" />
 
-          <div className="relative z-10 flex flex-col h-full overflow-y-auto hide-scrollbar px-12 py-8">
+          <div className="relative z-10 flex flex-col h-full overflow-hidden hide-scrollbar px-12 py-8">
             {/* HEADER */}
-            <header className="flex flex-col items-center text-center mb-6">
-              <p className="text-2xl font-[Bebas_Neue] tracking-wider opacity-80">
-                PRO PLAYER ANALYSIS
-              </p>
+            <header className="flex flex-col items-center text-center mb-6 mt-4">
+              <p className="text-6xl font-[Bebas_Neue] tracking-wider">PRO PLAYER ANALYSIS</p>
               <div className="my-3">
                 <HextechDivider />
               </div>
-              <p className="text-4xl mt-2">{playerName}</p>
-              <p className="text-lg tracking-widest opacity-90">YOU PLAY LIKE</p>
-              <p className="text-6xl font-[Bebas_Neue] text-yellow-400 tracking-wider leading-none mt-1">
-                {proPlayer.name.toUpperCase()}
-              </p>
             </header>
 
             {/* GRID SECTION */}
@@ -361,6 +362,11 @@ export function PlayerComparisonCard() {
 
               {/* PRO PLAYER IMAGE */}
               <div className="flex flex-col items-center">
+                <p className="text-4xl mt-2">{playerName}</p>
+                <p className="text-lg tracking-widest opacity-90">YOU PLAY LIKE</p>
+                <p className="text-5xl font-[Bebas_Neue] text-yellow-400 tracking-wider leading-none mt-1">
+                  {proPlayer.name.toUpperCase()}
+                </p>
                 <div
                   className="w-full h-[360px]"
                   style={{
@@ -369,10 +375,10 @@ export function PlayerComparisonCard() {
                     backgroundPosition: 'top center',
                   }}
                 />
-                <p className="text-5xl font-semibold tracking-wider mt-3">{proPlayer.name}</p>
-                <p className="text-lg opacity-80">
-                  {proPlayer.role} | {proPlayer.playstyle}
-                </p>
+                <div className="mt-4">
+                  <p className="text-lg opacity-80">{proPlayer.role}</p>
+                  <p className="text-lg opacity-80">{proPlayer.playstyle}</p>
+                </div>
               </div>
             </main>
 
