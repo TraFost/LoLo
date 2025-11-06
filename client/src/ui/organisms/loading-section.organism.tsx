@@ -72,7 +72,7 @@ export function LoadingSection({ isLoading = true, showProgressBar = false }: Lo
         <LoloIcon />
       </motion.div>
 
-      <p className="text-5xl font-[Bebas_Neue] tracking-wider text-yellow-400 mt-6">
+      <p className="text-5xl font-bebas-neue tracking-wider text-yellow-400 mt-6">
         {showProgressBar ? 'FORGING YOUR RECAP' : 'GETTING YOUR ACCOUNT INFORMATION'}
       </p>
       <HextechDivider />

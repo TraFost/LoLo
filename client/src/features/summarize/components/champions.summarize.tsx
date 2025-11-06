@@ -53,7 +53,7 @@ function ChampionsDesktop({ champions }: Props) {
 
             <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col">
               <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-4xl font-bold text-white font-[Bebas_Neue] leading-none">
+                <h2 className="text-4xl font-bold text-white font-bebas-neue leading-none">
                   {champ.name}
                 </h2>
                 <div className="flex items-center">
@@ -92,7 +92,7 @@ function ChampionsDesktop({ champions }: Props) {
     <section ref={ref} className="relative h-[380vh] w-full flex flex-col items-center">
       <div className="sticky top-0 h-screen flex flex-col justify-center items-center text-center">
         <motion.div
-          className="flex flex-col justify-center items-center text-7xl 2xl:text-9xl font-bold font-[Bebas_Neue] tracking-wide"
+          className="flex flex-col justify-center items-center text-7xl 2xl:text-9xl font-bold font-bebas-neue tracking-wide"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -125,7 +125,7 @@ function ChampionsMobile({ champions }: Props) {
     <section className="relative w-full flex flex-col items-center py-8">
       {/* Header */}
       <div className="w-full px-4 mb-6">
-        <p className="text-center text-5xl font-bold tracking-wide text-white font-[Bebas_Neue]">
+        <p className="text-center text-5xl font-bold tracking-wide text-white font-bebas-neue">
           MOST PLAYED CHAMPIONS
         </p>
         <p className="text-center text-sm text-gray-300">
@@ -149,7 +149,7 @@ function ChampionsMobile({ champions }: Props) {
                   className="w-[52px] h-[52px] object-cover rounded-md"
                 />
                 <div className="flex flex-col text-white">
-                  <h2 className="text-lg font-[Bebas_Neue] tracking-wide leading-none">
+                  <h2 className="text-lg font-bebas-neue tracking-wide leading-none">
                     {champ.name}
                   </h2>
                   <div className="flex gap-2 text-xs text-gray-300">
