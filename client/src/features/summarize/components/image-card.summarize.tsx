@@ -61,7 +61,7 @@ export function ImageCardSection({ children }: Props) {
 
 export function MostPlayedChampionsCard({ playerName, champions }: MostPlayedChampionsProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const bgImageUrl = '/assets/background/Demacia_City.jpg';
+  const bgImageUrl = '/assets/background/Demacia_City.webp';
 
   function Stat({
     label,
@@ -196,7 +196,7 @@ export function PlayerOverviewCard({
   roleDistribution,
 }: PlayerOverviewProps) {
   const ref = useRef(null);
-  const bgImageUrl = '/assets/background/Shurima.png';
+  const bgImageUrl = '/assets/background/Shurima.webp';
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -302,7 +302,7 @@ export function PlayerComparisonCard({ playerName, comparison }: PlayerCompariso
   const { playerAnalysis, proPlayer } = comparison;
 
   const ref = useRef(null);
-  const bgImageUrl = '/assets/background/Poro_King.jpg';
+  const bgImageUrl = '/assets/background/Poro_King.webp';
   const proPlayerImageUrl =
     'https://img.redbull.com/images/c_limit,w_1500,h_1000/f_auto,q_auto/redbullcom/2020/12/16/c61kpj1fxidgnwiqgz2h/faker-t1-lol';
 

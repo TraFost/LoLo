@@ -60,7 +60,7 @@ function ChampionsDesktop({ champions }: Props) {
                   <img
                     src={`/assets/mastery_banner/Mastery_${
                       champ.mastery!.level < 10 ? `${champ.mastery?.level}` : '10+'
-                    }_Banner.png`}
+                    }_Banner.webp`}
                     alt={`Mastery ${champ.mastery!.level}`}
                     width={52}
                   />
@@ -174,7 +174,7 @@ function ChampionsMobile({ champions }: Props) {
                   <img
                     src={`/assets/mastery_banner/Mastery_${
                       champ.mastery.level < 10 ? champ.mastery.level : '10+'
-                    }_Banner.png`}
+                    }_Banner.webp`}
                     alt={`Mastery ${champ.mastery.level}`}
                     className="w-10"
                   />
