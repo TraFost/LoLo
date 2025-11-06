@@ -5,6 +5,13 @@ import { ChampionStats, RoleDistribution, StatisticItem } from 'shared/src/types
 import { downloadToPng } from '../utils/image-card/download-to-png.util';
 import { getChampionIdForDDragon } from '../utils/champion/parse-champion-name.util';
 import { ProComparisonDTO } from 'shared/src/types/analyze.dto';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/ui/atoms/carousel';
 
 interface Props {
   children: React.ReactNode;
@@ -30,9 +37,25 @@ interface PlayerComparisonProps extends CardProps {
 
 export function ImageCardSection({ children }: Props) {
   return (
-    <div>
-      <div className="scale-[0.6] flex gap-24">{children}</div>
-    </div>
+    <Carousel className="w-full md:w-3/4 lg:w-1/2 2xl:w-5/12">
+      <CarouselContent className="flex">
+        {Array.isArray(children) ? (
+          children.map((child, idx) => (
+            <CarouselItem
+              key={idx}
+              className="flex justify-center scale-[0.4] md:scale-[0.6] select-none"
+            >
+              {child}
+            </CarouselItem>
+          ))
+        ) : (
+          <CarouselItem className="flex justify-center">{children}</CarouselItem>
+        )}
+      </CarouselContent>
+
+      <CarouselPrevious className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10" />
+      <CarouselNext className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10" />
+    </Carousel>
   );
 }
 

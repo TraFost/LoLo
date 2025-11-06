@@ -44,7 +44,7 @@ export function RecapIntro({ gameName, tagName, championName, profilePict }: Pro
         />
 
         <motion.h1
-          className="text-5xl font-bold tracking-wide"
+          className="text-3xl md:text-5xl font-bold tracking-wide"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 1 }}
@@ -59,7 +59,7 @@ export function RecapIntro({ gameName, tagName, championName, profilePict }: Pro
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: 1.2 }}
       >
-        <p className="text-xl text-slate-300 font-light leading-relaxed">
+        <p className="text-lg lg:text-xl text-slate-300 font-light leading-relaxed">
           Collaboration defines your journey this season. You fought side by side, learned from
           every battle, and discovered the power of persistence. Now it's time to reflect, and
           celebrate how far you've come.
