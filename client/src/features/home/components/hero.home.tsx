@@ -28,7 +28,7 @@ export function Hero() {
         >
           <motion.h1
             variants={fadeIn}
-            className="text-[clamp(2rem,5vw,4.5rem)] font-bebas-neue font-extrabold leading-[1.05] tracking-tight text-primary drop-shadow-[0_8px_40px_rgba(83,90,255,0.45)] [text-wrap:balance]"
+            className="text-[clamp(2rem,5vw,4.5rem)] font-extrabold leading-[1.05] tracking-tight text-primary drop-shadow-[0_8px_40px_rgba(83,90,255,0.45)] [text-wrap:balance]"
           >
             Start Learning. Start Winning.
           </motion.h1>
