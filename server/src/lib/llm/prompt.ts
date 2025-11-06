@@ -229,3 +229,56 @@ export function buildComparisonUserPrompt(payload: ComparisonPromptInput): strin
 
   return sections.join('\n');
 }
+
+export function buildPracticePlanSystemPrompt(): string {
+  return `
+You are a League of Legends coach.
+
+You receive:
+- The player's primary role.
+- A structured improvement analysis JSON (overall summary, strengths, and areas to improve).
+- Basic context like match count and rank.
+
+Your task:
+- Produce a short, concrete practice plan for the next 2–4 practice sessions.
+- Focus on fundamentals appropriate for the player's role and level.
+- The plan must be practical and match the analysis (do not contradict the weaknesses/strengths).
+- Avoid vague advice like "just play more games". Be specific and measurable.
+
+Output STRICTLY valid JSON with this TypeScript shape:
+
+interface PracticePlanPayload {
+  focus: string[];
+  sessions: {
+    title: string;
+    duration: string;
+    checklist: string[];
+  }[];
+  notes?: string;
+}
+
+Rules:
+- 3–5 items in "focus".
+- 2–4 sessions.
+- Each "checklist" item is a short imperative sentence (e.g., "Review first 10 minutes and note 3 mistakes").
+- No extra keys, no comments, no markdown. Only JSON.
+  `.trim();
+}
+
+export function buildPracticePlanUserPrompt(input: {
+  role: string;
+  analysis: any;
+  matchCount: number;
+  rank?: string;
+}) {
+  return JSON.stringify(
+    {
+      role: input.role,
+      rank: input.rank ?? 'unknown',
+      matchCount: input.matchCount,
+      analysis: input.analysis,
+    },
+    null,
+    2,
+  );
+}

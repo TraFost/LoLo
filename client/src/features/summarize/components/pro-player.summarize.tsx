@@ -1,38 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 import ChartRadar from '@/ui/molecules/chart-radar.molecule';
+import { useInView } from 'react-intersection-observer';
+import type { usePostComparison } from '../hooks/comparison/use-post-comparison';
 
-const playerAnalysis = [
-  { label: 'Preferred Role', value: 'Mid Lane' },
-  { label: 'Playstyle', value: 'Calculated & Reactive' },
-  { label: 'Team Impact', value: 'Consistent Lead Builder' },
-  { label: 'Decision Tempo', value: 'Measured, rarely rushed' },
-];
+interface Props {
+  playerName: string;
+  comparisonMutatation: ReturnType<typeof usePostComparison>;
+}
 
-const proPlayer = {
-  name: 'Faker',
-  role: 'Mid Lane',
-  playstyle: 'Controlled Aggression',
-  similarities: ['lane dominance', 'map awareness', 'tempo control'],
-  playstyleDetails: [
-    'You maintain lane pressure with composure and rarely overcommit. You rely on consistent trades, wave control, and vision timing rather than raw aggression.',
-    'When opportunities arise, you act decisively but only when your setup ensures advantage. You play like a strategist, not a gambler.',
-  ],
-  summary:
-    'Your play embodies controlled precision much like Faker, you manage risk with intelligence and let fundamentals carry your advantage. Both of you turn small wins into complete dominance.',
-};
-
-export function ProPlayer() {
-  const [status, setStatus] = useState<'locked' | 'loading' | 'revealed'>('locked');
+export function ProPlayer({ playerName, comparisonMutatation }: Props) {
+  const { ref, inView } = useInView({ triggerOnce: true });
+  const { data: comparison, mutate, isPending, isError, error } = comparisonMutatation;
 
   useEffect(() => {
-    setTimeout(() => setStatus('loading'), 500);
-    setTimeout(() => setStatus('revealed'), 1000);
-  }, []);
+    if (inView) {
+      mutate();
+    }
+  }, [inView, mutate]);
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden mt-24 grid grid-cols-1 lg:grid-cols-2">
+    <section
+      className="relative min-h-screen w-full overflow-hidden mt-24 grid grid-cols-1 lg:grid-cols-2"
+      ref={ref}
+    >
       {/* Divider (desktop only) */}
       <div className="absolute hidden lg:block top-0 left-1/2 w-[3px] h-full bg-gradient-to-b from-blue-400 to-transparent origin-top-left transform -skew-x-6" />
 
@@ -44,139 +36,249 @@ export function ProPlayer() {
         transition={{ duration: 0.3, ease: 'linear' }}
         className="flex flex-col justify-center items-center p-6 lg:pr-12"
       >
-        <motion.div
-          animate={status === 'revealed' ? { y: -20, opacity: 1 } : { y: 0, opacity: 1 }}
-          transition={{
-            duration: 0.6,
-            ease: [0.25, 0.1, 0.25, 1],
-          }}
-          className="max-w-md text-center lg:text-left"
-        >
-          <h3 className="text-3xl lg:text-5xl font-bold text-white">LoLo#AI</h3>
-          <p className="text-gray-300 text-base lg:text-lg mt-4 leading-relaxed mb-6">
-            From your plays to your instincts, this is the essence of how you approach the game.
-          </p>
-
-          <div className="grid grid-cols-2 gap-4 text-gray-300">
-            {playerAnalysis.map((stat, i) => (
-              <div key={i}>
-                <p className="text-sm text-gray-500">{stat.label}</p>
-                <p className="text-lg font-semibold text-white">{stat.value}</p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {status === 'revealed' && (
+        {isPending && (
           <motion.div
-            initial={{ x: -500, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{
-              duration: 0.3,
-              ease: 'linear',
-              delay: 0.5,
-            }}
-            className="w-full"
+            key="loading"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="flex flex-col items-center justify-center text-center gap-8 py-20 text-gray-300"
           >
-            <ChartRadar />
+            {/* Icon + Subtle Glow */}
+            <motion.div
+              className="relative w-24 h-24"
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 12, ease: 'linear' }}
+            >
+              <div className="absolute inset-0 bg-cyan-400/10 blur-2xl rounded-full" />
+              <LoloIcon size="sm" animation="spin" />
+            </motion.div>
+
+            {/* Text Section */}
+            <div className="max-w-lg space-y-3">
+              <h3 className="text-4xl lg:text-5xl font-bold text-white tracking-tight">
+                Analyzing {playerName}
+              </h3>
+              <p className="text-base lg:text-lg leading-relaxed text-gray-400">
+                Gathering your match history, decoding your plays, and refining your performance
+                metrics.
+                <br />
+                Sit tight while LoLo crafts your personalized analysis.
+              </p>
+            </div>
+
+            {/* Subtle Pulse Bar */}
+            <motion.div
+              className="w-48 h-1 rounded-full bg-gradient-to-r from-cyan-500 via-blue-400 to-purple-500"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: 'linear',
+              }}
+              style={{
+                backgroundSize: '200% 200%',
+              }}
+            />
+
+            {/* Small Footer Text */}
+            <p className="text-sm text-gray-500 italic mt-2">This might take a few seconds...</p>
           </motion.div>
+        )}
+
+        {isError && (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col gap-4 text-blue-400 items-center"
+          >
+            <p className="text-red-400 font-semibold text-lg">Something went wrong</p>
+            <p className="text-slate-400 text-sm max-w-md">{error.message}</p>
+          </motion.div>
+        )}
+
+        {comparison && (
+          <>
+            <div className="max-w-md text-center lg:text-left">
+              <h3 className="text-3xl lg:text-5xl font-bold text-white">{playerName}</h3>
+              <p className="text-gray-300 text-base lg:text-lg mt-4 leading-relaxed mb-6">
+                From your plays to your instincts, this is the essence of how you approach the game.
+              </p>
+
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-gray-300">
+                {comparison.playerAnalysis.map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05, duration: 0.25 }}
+                    className="border-l border-blue-800 pl-4 hover:border-blue-500 transition-colors duration-200"
+                  >
+                    <p className="text-sm text-gray-400">{stat.label}</p>
+                    <p className="text-lg font-semibold text-white mt-1">{stat.value}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            <motion.div
+              initial={{ x: -500, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{
+                duration: 0.8,
+                ease: 'linear',
+                delay: 0.5,
+              }}
+              className="w-full"
+            >
+              <ChartRadar
+                data={comparison.comparisonChart}
+                playerName={playerName}
+                proPlayerName={comparison.proPlayer.name}
+              />
+            </motion.div>
+          </>
         )}
       </motion.div>
 
       {/* RIGHT - Comparison / Loading / Reveal */}
       <div className="relative flex flex-col items-center justify-start lg:justify-center p-6 lg:pl-12 text-center lg:text-left">
-        <AnimatePresence mode="wait">
-          {status === 'locked' && (
+        {isPending && (
+          <motion.div
+            key="pro-player-loading"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="flex flex-col items-center gap-5 text-center text-blue-400 py-16"
+          >
+            {/* Animated Icon */}
             <motion.div
-              key="locked"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col gap-6 max-w-md mx-auto"
+              className="relative w-24 h-24"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
             >
-              <p className="text-lg lg:text-xl text-gray-400">
-                I think I've seen a playstyle like yours before... wanna see who it is?
+              <div className="absolute inset-0 bg-blue-500/10 blur-2xl rounded-full" />
+              <LoloIcon size="sm" animation="spin" />
+            </motion.div>
+
+            {/* Text Section */}
+            <div className="space-y-2">
+              <h3 className="text-2xl lg:text-3xl font-semibold text-white tracking-tight">
+                Analyzing pro player matchups
+              </h3>
+              <p className="text-sm lg:text-base text-gray-400 max-w-md mx-auto leading-relaxed">
+                Comparing your gameplay with top-tier pros, and finding whose style fits you best
               </p>
-            </motion.div>
-          )}
+            </div>
 
-          {status === 'loading' && (
+            {/* Progress Pulse Bar */}
             <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col gap-4 text-blue-400 items-center"
-            >
-              <div className="w-24">
-                <LoloIcon size="sm" animation="spin" />
-              </div>
-              <p className="text-lg lg:text-xl">Analyzing your gameplay...</p>
-            </motion.div>
-          )}
-
-          {status === 'revealed' && (
-            <motion.div
-              key="revealed"
-              initial={{ opacity: 0, x: 300 }}
-              animate={{ opacity: 1, x: 0 }}
+              className="w-40 h-1 rounded-full bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
               transition={{
-                duration: 0.3,
+                duration: 2.4,
+                repeat: Infinity,
                 ease: 'linear',
               }}
-              className="relative w-full max-w-2xl mx-auto"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                {/* Player Descriptive Summary */}
-                <div className="flex flex-col gap-3 text-gray-300 order-2 md:order-1">
-                  <h4 className="text-2xl font-bold text-white mb-2">Your Playstyle</h4>
-                  {proPlayer.playstyleDetails.map((detail, i) => (
-                    <p key={i} className="text-gray-300">
-                      {detail}
-                    </p>
-                  ))}
-                </div>
+              style={{
+                backgroundSize: '200% 200%',
+              }}
+            />
 
-                {/* Pro Player Comparison */}
-                <div className="flex flex-col items-center md:items-start gap-3 order-1 md:order-2">
-                  <img
-                    src="https://img.redbull.com/images/c_limit,w_1500,h_1000/f_auto,q_auto/redbullcom/2020/12/16/c61kpj1fxidgnwiqgz2h/faker-t1-lol"
-                    alt="faker"
-                    className="aspect-square object-cover w-40 h-40 md:w-52 md:h-52"
-                  />
-                  <h2 className="text-2xl md:text-3xl font-bold text-white">{proPlayer.name}</h2>
-                  <p className="text-gray-400 text-base md:text-lg">
-                    {proPlayer.role}, {proPlayer.playstyle}
-                  </p>
-                  <div className="mt-2 text-gray-300">
-                    <p className="text-sm">
-                      Similarities found in: {proPlayer.similarities.join(', ')}.
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {/* Subtle Hint */}
+            <p className="text-xs text-gray-500 italic mt-3">This may take a few moments...</p>
+          </motion.div>
+        )}
 
-              {/* Comparison Summary */}
-              <motion.div
-                initial={{ opacity: 0, x: 300 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5, ease: 'linear' }}
-                className="mt-10 border-t border-gray-700 pt-6"
-              >
-                <h3 className="text-3xl font-bold text-white">Match Insight</h3>
-                <p className="text-gray-300 mt-2 leading-relaxed">{proPlayer.summary}</p>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {status === 'revealed' && (
+        {isError && (
           <motion.div
-            className="absolute inset-0 bg-blue-500/10 blur-3xl"
+            key="loading"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
-          />
+            exit={{ opacity: 0 }}
+            className="flex flex-col gap-4 text-blue-400 items-center"
+          >
+            <p className="text-red-400 font-semibold text-lg">Something went wrong</p>
+            <p className="text-slate-400 text-sm max-w-md">{error.message}</p>
+          </motion.div>
+        )}
+
+        {comparison && (
+          <>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="revealed"
+                initial={{ opacity: 0, x: 300 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  delay: 0.5,
+                  duration: 0.3,
+                  ease: 'linear',
+                }}
+                className="relative w-full max-w-2xl mx-auto"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                  {/* Player Descriptive Summary */}
+                  <div className="flex flex-col gap-3 text-gray-300 order-2 md:order-1">
+                    <h4 className="text-2xl font-bold text-white mb-2">Your Playstyle</h4>
+                    {comparison.proPlayer.playstyleDetails.map((detail, i) => (
+                      <p key={i} className="text-gray-300">
+                        {detail}
+                      </p>
+                    ))}
+                  </div>
+
+                  {/* Pro Player Comparison */}
+                  <div className="flex flex-col items-center md:items-start gap-3 order-1 md:order-2">
+                    <img
+                      src="https://img.redbull.com/images/c_limit,w_1500,h_1000/f_auto,q_auto/redbullcom/2020/12/16/c61kpj1fxidgnwiqgz2h/faker-t1-lol"
+                      alt="faker"
+                      className="aspect-square object-cover w-40 h-40 md:w-52 md:h-52"
+                    />
+                    <h2 className="text-2xl md:text-3xl font-bold text-white">
+                      {comparison.proPlayer.name}
+                    </h2>
+                    <p className="text-gray-400 text-base md:text-lg">
+                      {comparison.proPlayer.role}, {comparison.proPlayer.playstyle}
+                    </p>
+                    <div className="mt-2 text-gray-300">
+                      <p className="text-sm">
+                        Similarities found in: {comparison.proPlayer.similarities.join(', ')}.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Comparison Summary */}
+                <motion.div
+                  initial={{ opacity: 0, x: 300 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8, ease: 'linear' }}
+                  className="mt-10 border-t border-gray-700 pt-6"
+                >
+                  <h3 className="text-3xl font-bold text-white">Match Insight</h3>
+                  <p className="text-gray-300 mt-2 leading-relaxed">
+                    {comparison.proPlayer.summary}
+                  </p>
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+
+            <motion.div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-500/10 blur-3xl size-1/2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 1 }}
+            />
+          </>
         )}
       </div>
     </section>

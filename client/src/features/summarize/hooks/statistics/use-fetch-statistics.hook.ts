@@ -5,17 +5,33 @@ import type { StatisticsResponse } from 'shared/src/types/statistics.type';
 import { useFetchAccount } from '../account/use-fetch-account.hook';
 
 const fetchStatistics = async (puuid: string, region: string): Promise<StatisticsResponse> => {
-  const res = await axios.get<ResponseWithData<StatisticsResponse>>(
-    `https://vncjbglssbpomo62pxk3rfkasu0ejovz.lambda-url.ap-southeast-1.on.aws/api/statistics/${puuid}`,
-    { params: { region } },
-  );
+  try {
+    const res = await axios.get<ResponseWithData<StatisticsResponse>>(
+      `https://vncjbglssbpomo62pxk3rfkasu0ejovz.lambda-url.ap-southeast-1.on.aws/api/statistics/${puuid}`,
+      { params: { region } },
+    );
+    const response = res.data;
 
-  const response = res.data;
-  if (!response.success) {
-    throw new Error(response.message || 'API call was not successful');
+    if (!response.success) {
+      throw new Error(response.message || 'API call was not successful');
+    }
+
+    return response.data;
+  } catch (error) {
+    let errorMessage = 'An unknown error occurred';
+
+    if (axios.isAxiosError(error)) {
+      errorMessage =
+        error.response?.data?.details?.message ||
+        error.response?.data?.message ||
+        error.message ||
+        'An Axios error occurred';
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    throw new Error(errorMessage);
   }
-
-  return response.data;
 };
 
 export function useFetchStatistics() {

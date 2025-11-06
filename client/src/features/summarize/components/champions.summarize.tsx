@@ -29,7 +29,6 @@ function ChampionsDesktop({ champions }: Props) {
 
     return (
       <div
-        key={i}
         className={`w-full flex justify-${isEven ? 'start' : 'end'} px-24 ${
           i !== 0 ? 'lg:-mt-24' : ''
         }`}
@@ -112,7 +111,7 @@ function ChampionsDesktop({ champions }: Props) {
         {champions.length !== 0 && (
           <>
             {champions.map((champ, i) => (
-              <ChampionCardDesktop champ={champ} i={i} />
+              <ChampionCardDesktop champ={champ} i={i} key={i} />
             ))}
           </>
         )}

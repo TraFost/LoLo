@@ -58,7 +58,7 @@ export function useFetchAccount() {
   const tagName = searchParams.get('tag');
   const region = searchParams.get('region');
 
-  const isMissingParams = searchParams.size === 0;
+  const isMissingParams = searchParams.size < 3;
 
   useEffect(() => {
     if (isMissingParams) {

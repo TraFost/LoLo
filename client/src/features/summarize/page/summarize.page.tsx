@@ -12,6 +12,7 @@ import {
 import { useFetchStatistics } from '../hooks/statistics/use-fetch-statistics.hook';
 import { fillChampions } from '../utils/champion/fill-champions.util';
 import { RenderState } from '../components/render-state.summarize';
+import { usePostComparison } from '../hooks/comparison/use-post-comparison';
 
 export function SummarizePage() {
   const {
@@ -25,6 +26,8 @@ export function SummarizePage() {
     isAccountLoading,
     accountError,
   } = useFetchStatistics();
+
+  const comparison = usePostComparison();
 
   const champions = fillChampions(statistics?.champions ?? [], 5);
 
@@ -51,10 +54,10 @@ export function SummarizePage() {
           <Statistics statistics={statistics.statistics} />
           <ChampionsSummarize champions={champions} />
           <GameplayOverview gameplayData={statistics.gameplay} />
-          <ProPlayer />
+          <ProPlayer playerName={accountData.gameName} comparisonMutatation={comparison} />
           <ImageCardSection>
             <MostPlayedChampionsCard
-              playerName={`${accountData!.gameName}#${accountData.tagLine}`}
+              playerName={`${accountData.gameName}#${accountData.tagLine}`}
               champions={champions}
             />
             <PlayerOverviewCard
@@ -62,7 +65,12 @@ export function SummarizePage() {
               statistics={statistics.statistics}
               roleDistribution={statistics.gameplay.roleDistribution}
             />
-            <PlayerComparisonCard />
+            {comparison.data && (
+              <PlayerComparisonCard
+                playerName={`${accountData.gameName}#${accountData.tagLine}`}
+                comparison={comparison.data}
+              />
+            )}
           </ImageCardSection>
         </div>
       ) : null}

@@ -18,9 +18,9 @@ app.post('/improvement', zValidator('json', improvementRequestSchema), async (c)
     const body = (await c.req.json()) as AnalyzeRequestDTO;
 
     const improvementService = new AnalyzeService(body.region as PlatformRegion);
-    const analysis = await improvementService.generateImprovementReport(body.puuid);
+    const report = await improvementService.generateImprovementReport(body.puuid);
 
-    return c.json(successWithData('Improvement analysis generated', analysis), StatusCodes.OK);
+    return c.json(successWithData('Improvement analysis generated', report), StatusCodes.OK);
   } catch (err: unknown) {
     console.error(err, 'Error in improvement analysis');
 

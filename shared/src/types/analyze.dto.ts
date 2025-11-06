@@ -39,3 +39,20 @@ export interface ProComparisonDTO {
 
 export type ImprovementRequestDTO = AnalyzeRequestDTO;
 export type ProComparisonRequestDTO = AnalyzeRequestDTO;
+
+export interface PracticeSession {
+  title: string;
+  duration: string;
+  checklist: string[];
+}
+
+export interface PracticePlanPayload {
+  focus: string[];
+  sessions: PracticeSession[];
+  notes?: string;
+}
+
+export interface ImprovementResponseDTO {
+  analysis: AnalysisDTO;
+  practicePlan?: PracticePlanPayload;
+}
