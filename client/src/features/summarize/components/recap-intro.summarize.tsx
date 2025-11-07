@@ -1,15 +1,27 @@
 import { motion } from 'motion/react';
 import { getChampionIdForDDragon } from '../utils/champion/parse-champion-name.util';
+import { RankSummaryDTO } from 'shared/src/types/account.type';
+import { getLevelBorder } from '../utils/recap-intro/getLevelBorder';
 
 interface Props {
   gameName: string;
   tagName: string;
   championName: string;
   profilePict: string;
+  rank: RankSummaryDTO;
+  summonerLevel: number;
 }
 
-export function RecapIntro({ gameName, tagName, championName, profilePict }: Props) {
+export function RecapIntro({
+  gameName,
+  tagName,
+  championName,
+  profilePict,
+  rank,
+  summonerLevel,
+}: Props) {
   const championId = getChampionIdForDDragon(championName);
+  const levelBorder = getLevelBorder(summonerLevel);
 
   return (
     <section className="w-full h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
@@ -32,25 +44,50 @@ export function RecapIntro({ gameName, tagName, championName, profilePict }: Pro
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: 'easeOut' }}
       >
-        <motion.img
-          src={profilePict}
-          alt={profilePict}
-          width={128}
-          height={128}
-          className="drop-shadow-[0_0_20px_rgba(59,130,246,0.4)] rounded-full"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-        />
+        <div className="relative -z-10">
+          <img
+            src={profilePict}
+            alt="profile"
+            className="relative rounded-full"
+            width={128}
+            height={128}
+          />
+          <img
+            src={`assets/level-border/theme-${levelBorder}-border.webp`}
+            alt="level-border"
+            className="absolute top-4 scale-[2.5]"
+          />
+          <span className="absolute flex items-center justify-center bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 text-white bg-slate-900 border-2 border-primary rounded-full py-1 px-2 text-xs font-semibold">
+            {summonerLevel}
+          </span>
+        </div>
 
         <motion.h1
-          className="text-3xl md:text-5xl font-bold tracking-wide"
+          className="text-3xl md:text-5xl font-bold tracking-wide mt-12"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 1 }}
         >
           {gameName}#<span className="text-primary">{tagName}</span>
         </motion.h1>
+      </motion.div>
+      <motion.div
+        className="mt-8 flex items-center gap-4 bg-slate-900/60 px-6 py-3 z-10 backdrop-blur-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.4, duration: 1 }}
+      >
+        <img
+          src={`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${rank.tier.toLowerCase()}.png`}
+          alt={rank.tier}
+          className="w-14 h-14"
+        />
+        <div className="text-left">
+          <p className="text-lg font-semibold text-white">{rank.display}</p>
+          <p className="text-sm text-slate-400">
+            {rank.leaguePoints} LP • {rank.wins}W {rank.losses}L
+          </p>
+        </div>
       </motion.div>
 
       <motion.div
