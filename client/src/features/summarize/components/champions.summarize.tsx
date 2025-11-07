@@ -59,7 +59,7 @@ function ChampionsDesktop({ champions }: Props) {
                 <div className="flex items-center">
                   <img
                     src={`/assets/mastery_banner/Mastery_${
-                      champ.mastery!.level < 10 ? `${champ.mastery?.level}` : '10+'
+                      champ.mastery!.level < 10 ? `${champ.mastery?.level}` : '10'
                     }_Banner.webp`}
                     alt={`Mastery ${champ.mastery!.level}`}
                     width={52}
@@ -89,7 +89,7 @@ function ChampionsDesktop({ champions }: Props) {
   }
 
   return (
-    <section ref={ref} className="relative h-[380vh] w-full flex flex-col items-center">
+    <section ref={ref} className="relative h-[450vh] w-full flex flex-col items-center">
       <div className="sticky top-0 h-screen flex flex-col justify-center items-center text-center">
         <motion.div
           className="flex flex-col justify-center items-center text-7xl 2xl:text-9xl font-bold font-bebas-neue tracking-wide"
@@ -173,7 +173,7 @@ function ChampionsMobile({ champions }: Props) {
                   </div>
                   <img
                     src={`/assets/mastery_banner/Mastery_${
-                      champ.mastery.level < 10 ? champ.mastery.level : '10+'
+                      champ.mastery.level < 10 ? champ.mastery.level : '10'
                     }_Banner.webp`}
                     alt={`Mastery ${champ.mastery.level}`}
                     className="w-10"
