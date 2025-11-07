@@ -13,6 +13,7 @@ import analyzeRoutes from './routes/analyze.route';
 import proRoutes from './routes/pro.route';
 
 import { CORS } from './configs/cors.config';
+import { rateLimiterConfig } from './configs/rate-limiter.config';
 
 import { errorHandler } from './lib/utils/response.util';
 
@@ -30,6 +31,8 @@ export function createApp() {
     }
   });
   app.onError(errorHandler);
+
+  app.use(rateLimiterConfig);
 
   app.use('*', requestLogger);
   app.use(logger());
