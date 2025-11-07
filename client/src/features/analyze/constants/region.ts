@@ -1,0 +1,18 @@
+export const REGION = {
+  na1: 'North America',
+  euw1: 'Europe West',
+  eun1: 'Europe Nordic & Eastern',
+  kr: 'Korea',
+  jp1: 'Japan',
+  br1: 'Brazil',
+  la1: 'Latin America South',
+  la2: 'Latin America North',
+  oc1: 'Oceania',
+  tr1: 'Turkey',
+  ru: 'Russia',
+  ph2: 'Philippines',
+  sg2: 'Singapore',
+  th2: 'Thailand',
+  tw2: 'Taiwan',
+  vn2: 'Vietnam',
+} as const;
