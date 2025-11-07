@@ -4,14 +4,14 @@ import { AnimatePresence, motion } from 'motion/react';
 import { HextechDivider } from '../atoms/hextech-divider';
 
 const loadingMessages = [
-  'Calculating your KDA...',
-  'Analyzing your lane dominance...',
-  'Counting your total pentakills (or attempts)...',
-  'Consulting the Elder Dragon...',
-  'Fetching match history...',
-  'Debating if that was truly a "skill issue"...',
-  'Polishing your S+ grades...',
-  'Almost done, just warding the river...',
+  'Calculating your KDA',
+  'Analyzing your lane dominance',
+  'Counting your total pentakills (or attempts)',
+  'Consulting the Elder Dragon',
+  'Fetching match history',
+  'Debating if that was truly a "skill issue"',
+  'Polishing your S+ grades',
+  'Almost done, just warding the river',
 ];
 
 interface LoadingSectionProps {
@@ -81,7 +81,7 @@ export function LoadingSection({ isLoading = true, showProgressBar = false }: Lo
         <AnimatePresence mode="wait">
           <motion.p
             key={messageIndex}
-            className="text-xl font-semibold tracking-wide text-gray-300"
+            className="text-xl font-semibold tracking-wide text-gray-300 text-center"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
