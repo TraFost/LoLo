@@ -12,6 +12,16 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/ui/atoms/carousel';
+import {
+  FacebookIcon,
+  FacebookShareButton,
+  TwitterShareButton,
+  RedditShareButton,
+  XIcon,
+  RedditIcon,
+} from 'react-share';
+import { Popover, PopoverContent, PopoverTrigger } from '@/ui/atoms/popover';
+import { Share } from 'lucide-react';
 
 interface Props {
   children: React.ReactNode;
@@ -37,25 +47,33 @@ interface PlayerComparisonProps extends CardProps {
 
 export function ImageCardSection({ children }: Props) {
   return (
-    <Carousel className="w-full md:w-3/4 lg:w-1/2 2xl:w-5/12">
-      <CarouselContent className="flex">
-        {Array.isArray(children) ? (
-          children.map((child, idx) => (
-            <CarouselItem
-              key={idx}
-              className="flex justify-center scale-[0.4] md:scale-[0.6] select-none"
-            >
-              {child}
-            </CarouselItem>
-          ))
-        ) : (
-          <CarouselItem className="flex justify-center">{children}</CarouselItem>
-        )}
-      </CarouselContent>
+    <section className="w-full px-4 flex flex-col lg:flex-row items-center justify-center font-bold mt-24 lg:-mt-48">
+      <div className="text-center -mb-96 md:-mb-64 lg:-mb-0 z-50 px-2 lg:order-2 lg:max-w-1/4 lg:w-full">
+        <p className="text-5xl 2xl:text-6xl font-bold">Share your achievements</p>
+        <p className="text-lg font-light text-gray-300 text-center mt-2 mb-8">
+          Let everyone see your top champions and proudest moments
+        </p>
+      </div>
+      <Carousel className="w-full md:w-3/4 lg:w-1/2 2xl:w-5/12">
+        <CarouselContent className="flex">
+          {Array.isArray(children) ? (
+            children.map((child, idx) => (
+              <CarouselItem
+                key={idx}
+                className="flex justify-center scale-[0.4] md:scale-[0.6] select-none"
+              >
+                {child}
+              </CarouselItem>
+            ))
+          ) : (
+            <CarouselItem className="flex justify-center">{children}</CarouselItem>
+          )}
+        </CarouselContent>
 
-      <CarouselPrevious className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10" />
-      <CarouselNext className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10" />
-    </Carousel>
+        <CarouselPrevious className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10" />
+        <CarouselNext className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10" />
+      </Carousel>
+    </section>
   );
 }
 
@@ -178,14 +196,21 @@ export function MostPlayedChampionsCard({ playerName, champions }: MostPlayedCha
           </div>
         </div>
       </div>
-      <Button
-        size="lg"
-        variant="flat"
-        className="scale-150 mt-8"
-        onClick={() => downloadToPng(ref, 'LoLo - Most Champions Played')}
-      >
-        Download
-      </Button>
+      <div className="flex gap-24 justify-center w-full">
+        <Button
+          size="lg"
+          variant="flat"
+          className="scale-125"
+          onClick={() => downloadToPng(ref, 'LoLo - Most Champions Played')}
+        >
+          Download
+        </Button>
+        <ShareButton
+          title={`Take a look my favorite champions ${champions[0].name} with ${
+            champions[0].matches
+          } and ${champions[0].winrate.toFixed(1)}% winrate`}
+        />
+      </div>
     </div>
   );
 }
@@ -286,14 +311,19 @@ export function PlayerOverviewCard({
           </footer>
         </div>
       </div>
-      <Button
-        size="lg"
-        variant="flat"
-        className="scale-150 mt-8"
-        onClick={() => downloadToPng(ref, 'LoLo - Player Overview')}
-      >
-        Download
-      </Button>
+      <div className="flex gap-24 justify-center w-full">
+        <Button
+          size="lg"
+          variant="flat"
+          className="scale-125"
+          onClick={() => downloadToPng(ref, 'LoLo - Player Overview')}
+        >
+          Download
+        </Button>
+        <ShareButton
+          title={`I think ${statistics[0].value} ${statistics[0].title} with ${statistics[1].value} ${statistics[1].title} wasn't too bad`}
+        />
+      </div>
     </div>
   );
 }
@@ -411,14 +441,51 @@ export function PlayerComparisonCard({ playerName, comparison }: PlayerCompariso
           </div>
         </div>
       </div>
-      <Button
-        size="lg"
-        variant="flat"
-        className="scale-150 mt-8"
-        onClick={() => downloadToPng(ref, 'LoLo - Pro Player Analysis')}
-      >
-        Download
-      </Button>
+      <div className="flex gap-24 justify-center w-full">
+        <Button
+          size="lg"
+          variant="flat"
+          className="scale-125"
+          onClick={() => downloadToPng(ref, 'LoLo - Pro Player Analysis')}
+        >
+          Download
+        </Button>
+        <ShareButton title={`I play like ${proPlayer.name} lol`} />
+      </div>
     </div>
+  );
+}
+
+function ShareButton({ title }: { title: string }) {
+  const url = window.location.href;
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant={'flat'}
+          size={'lg'}
+          color="accent"
+          className="scale-125 flex items-center gap-2"
+        >
+          <Share />
+          Share
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-fit flex flex-col gap-2 bg-neutral-900/90 rounded-none text-white">
+        <TwitterShareButton url={url} title={title} className="flex items-center gap-4 w-full">
+          <XIcon size={36} />
+          <span>X</span>
+        </TwitterShareButton>
+        <FacebookShareButton url={url} title={title} className="flex items-center gap-4 w-full">
+          <FacebookIcon size={36} />
+          <span>Facebook</span>
+        </FacebookShareButton>
+        <RedditShareButton url={url} title={title} className="flex items-center gap-4 w-full">
+          <RedditIcon size={36} />
+          <span>Reddit</span>
+        </RedditShareButton>
+      </PopoverContent>
+    </Popover>
   );
 }
