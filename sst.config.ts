@@ -52,6 +52,14 @@ export default $config({
       },
     });
 
-    return { ApiUrl: apiFn.url };
+    const client = new sst.aws.StaticSite('lolo-client', {
+      path: 'client',
+      build: {
+        command: 'pnpm run build',
+        output: 'dist',
+      },
+    });
+
+    return { ApiUrl: apiFn.url, client: client.url };
   },
 });
