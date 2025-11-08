@@ -35,4 +35,23 @@ app.post('/ingest', zValidator('json', proIngestSchema), async (c) => {
   }
 });
 
+app.post('/names/sync', async (c) => {
+  try {
+    const service = new ProService();
+    const result = await service.applyNameOverrides();
+    return c.json(successWithData('Pro names synchronized', result), StatusCodes.OK);
+  } catch (err: unknown) {
+    if (err instanceof HTTPException) {
+      throw err;
+    }
+
+    console.error('Error syncing pro names', err);
+
+    throw new HTTPException(StatusCodes.INTERNAL_SERVER_ERROR, {
+      message: 'Failed to sync pro names',
+      cause: err,
+    });
+  }
+});
+
 export default app;

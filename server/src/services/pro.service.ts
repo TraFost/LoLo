@@ -1,9 +1,10 @@
 import type { PlatformRegion } from 'shared/src/types/account.type';
 
-import { putObject, getJSONFromS3 } from '../lib/utils/s3.util';
+import { putObject, getJSONFromS3, isS3Enabled } from '../lib/utils/s3.util';
 import { buildPlayerSignature } from '../lib/utils/signature.util';
 import type { ProProfile, ProSignature } from '../types/pro.type';
 import { AnalyzeService } from './analyze.service';
+import { PRO_NAME_OVERRIDES } from '../constants/pro-name-overrides';
 
 export interface ProIngestInput {
   id: string;
@@ -61,6 +62,52 @@ export class ProService {
     return { profile, signature: indexEntry };
   }
 
+  async applyNameOverrides(overrides = PRO_NAME_OVERRIDES) {
+    if (!isS3Enabled()) {
+      throw new Error('S3 access is disabled. Run in an SST-linked environment.');
+    }
+
+    const updated: string[] = [];
+    const skipped: string[] = [];
+    const missing: string[] = [];
+
+    for (const [id, desiredName] of Object.entries(overrides)) {
+      const key = `pros/full/${id}.json`;
+      try {
+        const profile = await getJSONFromS3<ProProfile>(key);
+        if (!profile) {
+          missing.push(id);
+          continue;
+        }
+
+        if (profile.name === desiredName) {
+          skipped.push(id);
+          continue;
+        }
+
+        profile.name = desiredName;
+
+        await putObject({
+          key,
+          body: JSON.stringify(profile, null, 2),
+          contentType: 'application/json',
+          metadata: { updatedat: new Date().toISOString() },
+        });
+
+        updated.push(id);
+      } catch (err: any) {
+        if (this.isNotFound(err)) {
+          missing.push(id);
+          continue;
+        }
+        console.error(`[pro-service] Failed to update ${id}`, err);
+        throw err;
+      }
+    }
+
+    return { updated, skipped, missing };
+  }
+
   private async loadExistingSignatures(): Promise<ProSignature[]> {
     try {
       const index = await getJSONFromS3<ProSignature[]>('pros/index.json');
@@ -79,5 +126,17 @@ export class ProService {
       }
       throw err;
     }
+  }
+
+  private isNotFound(err: any): boolean {
+    if (!err) return false;
+    const status = err?.$metadata?.httpStatusCode;
+    const name = err?.name;
+    const message = err?.message as string | undefined;
+    return (
+      status === 404 ||
+      name === 'NoSuchKey' ||
+      (typeof message === 'string' && message.includes('Empty object'))
+    );
   }
 }
