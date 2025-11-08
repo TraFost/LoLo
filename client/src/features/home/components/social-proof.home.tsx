@@ -1,9 +1,9 @@
 import { motion } from 'motion/react';
 
 const proofPoints = [
-  'Built on AWS with Amazon Bedrock AI',
+  'Powered by AWS Bedrock LLMs',
   'Riot Games API compliant and secure',
-  'Trusted by 500+ climbing players',
+  'Respectful of your data privacy',
 ];
 
 const marqueeItems = [...proofPoints, ...proofPoints];
