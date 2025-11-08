@@ -62,6 +62,7 @@ export default $config({
       },
       environment: {
         VITE_SERVER_URL: apiFn.url,
+        VITE_SHARE_BASE_URL: apiFn.url,
       },
     });
 

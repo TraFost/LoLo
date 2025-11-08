@@ -4,7 +4,6 @@ import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 import ChartRadar from '@/ui/molecules/chart-radar.molecule';
 
 import { PLAYER_IMAGES } from '@/core/constants/player.constant';
-import { usePostAnalyze } from '../hooks/analyze/use-post-analyze.hook';
 import { useQuery } from '@tanstack/react-query';
 import { AnalyzeResponse } from '@/types/analyze';
 
