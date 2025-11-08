@@ -10,51 +10,100 @@ import { AccountService } from './account.service';
 import type {
   AnalysisDTO,
   ImprovementResponseDTO,
+  PracticePlanPayload,
   ProComparisonDTO,
 } from 'shared/src/types/analyze.dto';
 import { normalizeRole } from '../lib/utils/helper.util';
 import { createRegionalClient } from '../lib/utils/riot.util';
+import { getJSONFromS3, isS3Enabled, putObject } from '../lib/utils/s3.util';
 
 export class AnalyzeService {
   private regionalClient: HttpInstance;
   private readonly accountService: AccountService;
+  private readonly region: PlatformRegion;
 
   constructor(platformRegion: PlatformRegion) {
     this.regionalClient = createRegionalClient(platformRegion);
     this.accountService = new AccountService(platformRegion);
+    this.region = platformRegion;
   }
 
   async generateImprovementReport(puuid: string): Promise<ImprovementResponseDTO> {
-    const { role, matchData, rank } = await this.getImprovementAnalysis(puuid);
-    const analyst = new PlayerAnalystAgent();
-    const analysis = await analyst.run({ role, matchData });
+    const improvementKey = this.buildCacheKey('improvement', puuid);
+    const practicePlanKey = this.buildCacheKey('practice-plan', puuid);
 
-    const practiceAgent = new PracticePlanAgent();
-    const practicePlan = await practiceAgent.run({
-      role,
-      analysis,
-      matchCount: matchData.length,
-      rank,
-    });
+    const [cachedImprovement, cachedPracticePlan] = await Promise.all([
+      this.readCache<AnalysisDTO>(improvementKey),
+      this.readCache<PracticePlanPayload>(practicePlanKey),
+    ]);
+
+    let analysis = cachedImprovement ?? null;
+    let practicePlan = cachedPracticePlan ?? null;
+
+    let context: { role: string; matchData: any[]; rank?: string } | null = null;
+
+    if (!analysis || !practicePlan) {
+      context = await this.getImprovementAnalysis(puuid);
+    }
+
+    if (!analysis && context) {
+      const analyst = new PlayerAnalystAgent();
+      analysis = await analyst.run({ role: context.role, matchData: context.matchData });
+      await this.writeCache(improvementKey, analysis);
+    }
+
+    if (!practicePlan && context) {
+      if (!analysis) {
+        throw new Error('Unable to generate practice plan without analysis payload.');
+      }
+      const practiceAgent = new PracticePlanAgent();
+      practicePlan = await practiceAgent.run({
+        role: context.role,
+        analysis,
+        matchCount: context.matchData.length,
+        rank: context.rank,
+      });
+      await this.writeCache(practicePlanKey, practicePlan);
+    }
+
+    if (!analysis) {
+      throw new Error('Failed to load or generate improvement analysis.');
+    }
 
     return {
       analysis,
-      practicePlan,
+      practicePlan: practicePlan ?? undefined,
     };
   }
 
   async generateProComparison(puuid: string): Promise<ProComparisonDTO> {
+    const comparisonKey = this.buildCacheKey('pro-comparison', puuid);
+    const cachedComparison = await this.readCache<ProComparisonDTO>(comparisonKey);
+    if (cachedComparison) {
+      return cachedComparison;
+    }
+
     const { role, matchData } = await this.getImprovementAnalysis(puuid);
     const analyst = new PlayerAnalystAgent();
-    const playerAnalysis = await analyst.run({ role, matchData });
+
+    const improvementKey = this.buildCacheKey('improvement', puuid);
+    let analysis = await this.readCache<AnalysisDTO>(improvementKey);
+
+    if (!analysis) {
+      analysis = await analyst.run({ role, matchData });
+      await this.writeCache(improvementKey, analysis);
+    }
 
     const comparisonAgent = new ProComparisonAgent(analyst);
-
-    return comparisonAgent.run({
+    const comparison = await comparisonAgent.run({
       role,
       matchData,
-      playerAnalysis,
+      playerAnalysis: analysis,
     });
+
+    await this.writeCache(comparisonKey, comparison);
+
+    return comparison;
   }
 
   async getImprovementAnalysis(puuid: string): Promise<{
@@ -154,5 +203,54 @@ export class AnalyzeService {
     return matches
       .map((m) => m.info.participants.find((p) => p.puuid === puuid))
       .filter((p): p is ParticipantDTO => !!p);
+  }
+
+  private buildCacheKey(
+    type: 'improvement' | 'practice-plan' | 'pro-comparison',
+    puuid: string,
+  ): string {
+    return `analyze/${type}/${this.region}/${puuid}.json`;
+  }
+
+  private async readCache<T>(key: string): Promise<T | null> {
+    if (!isS3Enabled()) return null;
+
+    try {
+      return await getJSONFromS3<T>(key);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      const code = (err as any)?.Code ?? (err as any)?.code ?? (err as any)?.name ?? '';
+      const status = (err as any)?.$metadata?.httpStatusCode;
+      const expectedMiss =
+        code === 'NoSuchKey' ||
+        code === 'NotFound' ||
+        status === 404 ||
+        message.includes('NoSuchKey') ||
+        message.includes('S3 access is disabled');
+
+      if (!expectedMiss) {
+        console.warn(`[AnalyzeService] cache read failed for ${key}`, err);
+      }
+
+      return null;
+    }
+  }
+
+  private async writeCache(key: string, data: unknown): Promise<void> {
+    if (!isS3Enabled()) return;
+
+    try {
+      await putObject({
+        key,
+        body: JSON.stringify(data),
+        contentType: 'application/json',
+        metadata: { cachedat: new Date().toISOString() },
+      });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      if (!message.includes('S3 access is disabled')) {
+        console.warn(`[AnalyzeService] cache write failed for ${key}`, err);
+      }
+    }
   }
 }
