@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
 import { StatusCodes } from 'shared/src/http-status';
 import type { PlatformRegion } from 'shared/src/types/account.type';
@@ -10,6 +10,7 @@ import { zValidator } from '../middlewares/validator.middleware';
 
 import { improvementRequestSchema } from '../schemas/analyze.schema';
 import { successWithData } from '../lib/utils/response.util';
+import { handleRiotError } from '../lib/utils/riot-error.util';
 
 const app = new Hono();
 
@@ -22,12 +23,12 @@ app.post('/improvement', zValidator('json', improvementRequestSchema), async (c)
 
     return c.json(successWithData('Improvement analysis generated', report), StatusCodes.OK);
   } catch (err: unknown) {
-    console.error(err, 'Error in improvement analysis');
-
-    throw new HTTPException(StatusCodes.INTERNAL_SERVER_ERROR, {
-      message: 'Failed to generate improvement analysis',
-      cause: err,
-    });
+    console.error('Error in improvement analysis', err);
+    handleRiotError(
+      err,
+      StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode,
+      'Failed to generate improvement analysis',
+    );
   }
 });
 
@@ -40,12 +41,12 @@ app.post('/pro-comparison', zValidator('json', improvementRequestSchema), async 
 
     return c.json(successWithData('Pro comparison generated', comparison), StatusCodes.OK);
   } catch (err: unknown) {
-    console.error(err, 'Error in pro comparison analysis');
-
-    throw new HTTPException(StatusCodes.INTERNAL_SERVER_ERROR, {
-      message: 'Failed to generate pro comparison',
-      cause: err,
-    });
+    console.error('Error in pro comparison analysis', err);
+    handleRiotError(
+      err,
+      StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode,
+      'Failed to generate pro comparison',
+    );
   }
 });
 

@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
 import { StatusCodes } from 'shared/src/http-status';
 import type { PlatformRegion } from 'shared/src/types/account.type';
@@ -10,6 +11,7 @@ import { statisticsSchema, statisticsQuerySchema } from '../schemas/statistics.s
 import { zValidator } from '../middlewares/validator.middleware';
 import { successWithData } from '../lib/utils/response.util';
 import { getJSONFromS3, isS3Enabled, putObject } from '../lib/utils/s3.util';
+import { handleRiotError } from '../lib/utils/riot-error.util';
 
 type StatisticsPayload = Awaited<ReturnType<StatisticsService['getStatistics']>>;
 
@@ -75,11 +77,11 @@ app.get(
       return c.json(successWithData('Statistics fetched successfully!', data), StatusCodes.OK);
     } catch (err: unknown) {
       console.error('Error fetching statistics:', err);
-
-      throw new HTTPException(StatusCodes.BAD_GATEWAY, {
-        message: 'Failed to fetch statistics from Riot API',
-        cause: err,
-      });
+      handleRiotError(
+        err,
+        StatusCodes.BAD_GATEWAY as ContentfulStatusCode,
+        'Failed to fetch statistics from Riot API',
+      );
     }
   },
 );
