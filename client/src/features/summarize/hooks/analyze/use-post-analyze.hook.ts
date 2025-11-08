@@ -1,40 +1,29 @@
-import axios from 'axios';
 import { useFetchAccount } from '../account/use-fetch-account.hook';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AnalyzeRequestDTO, ImprovementResponseDTO } from 'shared/src/types/analyze.dto';
 import { ResponseWithData } from 'shared/src/types/response';
+import { postComparison } from '../comparison/use-post-comparison';
+import { apiClient } from '@/lib/utils/api-client';
 
 const postAnalyze = async ({
   puuid,
   region,
 }: AnalyzeRequestDTO): Promise<ImprovementResponseDTO> => {
-  try {
-    const res = await axios.post<ResponseWithData<ImprovementResponseDTO>>(
-      'https://vncjbglssbpomo62pxk3rfkasu0ejovz.lambda-url.ap-southeast-1.on.aws/api/analyze/improvement',
-      {
-        puuid,
-        region,
-      },
-    );
+  const res = await apiClient.post<ResponseWithData<ImprovementResponseDTO>>(
+    '/analyze/improvement',
+    {
+      puuid,
+      region,
+    },
+  );
 
-    const response = res.data;
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error('Axios error details: ', error);
-
-      const errorMessage: string = error.response?.data?.details.message || error.message;
-
-      throw new Error(errorMessage);
-    } else {
-      console.error('An unexpected error occurred: ', error);
-      throw new Error('An unexpected error occurred');
-    }
-  }
+  const response = res.data;
+  return response.data;
 };
 
 export function usePostAnalyze() {
   const { data: accountData, region } = useFetchAccount();
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -42,12 +31,17 @@ export function usePostAnalyze() {
         throw new Error('Missing account data or region not provided');
       }
 
-      const payload = {
-        puuid: accountData.puuid,
-        region,
-      };
+      const payload = { puuid: accountData.puuid, region };
 
-      return postAnalyze(payload);
+      const [analyze, comparison] = await Promise.all([
+        postAnalyze(payload),
+        postComparison(payload),
+      ]);
+
+      return { analyze, comparison };
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['analyze', accountData?.puuid, region], data);
     },
   });
 
