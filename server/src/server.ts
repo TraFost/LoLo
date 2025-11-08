@@ -47,7 +47,6 @@ export function createApp() {
   api.route('/account', accountRoutes);
   api.route('/statistics', statisticsRoutes);
   api.route('/analyze', analyzeRoutes);
-  api.route('/pros', proRoutes);
 
   app.route('/', api);
 
