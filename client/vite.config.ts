@@ -13,7 +13,6 @@ export default defineConfig({
       '@ui': path.resolve(__dirname, './src/ui'),
     },
   },
-  envDir: '.env',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
