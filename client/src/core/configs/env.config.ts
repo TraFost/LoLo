@@ -1,4 +1,3 @@
 export const ENV = {
-  SERVER: import.meta.env.VITE_SERVER_URL,
-  RIOT: import.meta.env.VITE_RIOT_API_KEY,
+  SERVER: import.meta.env.VITE_SERVER_URL || 'http://localhost:3000',
 } as const;
