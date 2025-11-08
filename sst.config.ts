@@ -12,7 +12,9 @@ export default $config({
     const envFile = path.join(process.cwd(), 'server', '.env');
     const parsed = fs.existsSync(envFile) ? dotenv.parse(fs.readFileSync(envFile, 'utf8')) : {};
 
-    const bucket = new sst.aws.Bucket('storage');
+    const bucket = new sst.aws.Bucket('storage', {
+      public: true,
+    });
 
     const apiFn = new sst.aws.Function('ApiFn', {
       handler: 'server/src/lambda/index.handler',
@@ -58,6 +60,13 @@ export default $config({
         command: 'pnpm run build',
         output: 'dist',
       },
+      environment: {
+        VITE_SERVER_URL: apiFn.url,
+      },
+    });
+
+    apiFn.addEnvironment({
+      SHARE_PUBLIC_URL: apiFn.url,
     });
 
     return { ApiUrl: apiFn.url, client: client.url };

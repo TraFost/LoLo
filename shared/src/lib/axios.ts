@@ -19,6 +19,7 @@ type CreateClientOpts = {
   defaultHeaders?: Record<string, string>;
   userAgent?: string;
   onLog?: (msg: string, ctx?: any) => void;
+  isClient?: boolean;
 };
 
 export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
@@ -29,10 +30,13 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
     defaultHeaders = {},
     userAgent = 'LoLo-Client/1.0',
     onLog,
+    isClient = false,
   } = opts;
 
   const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 128 });
   const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 128 });
+
+  let agents = isClient && { httpAgent, httpsAgent };
 
   const instance = axios.create({
     baseURL,
@@ -43,10 +47,9 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
       'User-Agent': userAgent,
       ...defaultHeaders,
     },
+    ...agents,
     paramsSerializer: { serialize: (params) => qs.stringify(params, { arrayFormat: 'repeat' }) },
     validateStatus: (s) => s >= 200 && s < 300,
-    httpAgent,
-    httpsAgent,
     decompress: true,
     transitional: { clarifyTimeoutError: true },
   });

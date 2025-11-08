@@ -1,10 +1,11 @@
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/ui/atoms/button.atom';
 import { HextechDivider } from '@/ui/atoms/hextech-divider';
 import { ChampionStats, RoleDistribution, StatisticItem } from 'shared/src/types/statistics.type';
 import { downloadToPng } from '../utils/image-card/download-to-png.util';
 import { getChampionIdForDDragon } from '../utils/champion/parse-champion-name.util';
 import { ProComparisonDTO } from 'shared/src/types/analyze.dto';
+import type { ShareCardType } from 'shared/src/types/share.type';
 import {
   Carousel,
   CarouselContent,
@@ -24,6 +25,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/ui/atoms/popover';
 import { Share } from 'lucide-react';
 
 import { PLAYER_IMAGES } from '@/core/constants/player.constant';
+import { getOrCreateShareUrl } from '../utils/share/get-or-create-share-url.util';
 
 interface Props {
   children: React.ReactNode;
@@ -31,6 +33,7 @@ interface Props {
 
 interface CardProps {
   playerName: string;
+  puuid: string;
 }
 
 interface PlayerOverviewProps extends CardProps {
@@ -79,9 +82,40 @@ export function ImageCardSection({ children }: Props) {
   );
 }
 
-export function MostPlayedChampionsCard({ playerName, champions }: MostPlayedChampionsProps) {
+export function MostPlayedChampionsCard({
+  playerName,
+  champions,
+  puuid,
+}: MostPlayedChampionsProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isPreparingShare, setIsPreparingShare] = useState(false);
   const bgImageUrl = '/assets/background/Demacia_City.webp';
+  const cardType: ShareCardType = 'most-played';
+
+  useEffect(() => {
+    setShareUrl(null);
+    setIsPreparingShare(false);
+  }, [puuid]);
+
+  const handlePrepareShare = useCallback(async () => {
+    if (shareUrl || isPreparingShare) return;
+    setIsPreparingShare(true);
+
+    try {
+      const url = await getOrCreateShareUrl({
+        puuid,
+        cardType,
+        ref,
+      });
+      setShareUrl(url);
+    } catch (error) {
+      console.error('[MostPlayedChampionsCard] Failed to prepare share image', error);
+      throw error;
+    } finally {
+      setIsPreparingShare(false);
+    }
+  }, [cardType, isPreparingShare, puuid, shareUrl]);
 
   function Stat({
     label,
@@ -208,9 +242,12 @@ export function MostPlayedChampionsCard({ playerName, champions }: MostPlayedCha
           Download
         </Button>
         <ShareButton
-          title={`Take a look my favorite champions ${champions[0].name} with ${
+          title={`On the grind with ${champions[0].name}: ${
             champions[0].matches
-          } and ${champions[0].winrate.toFixed(1)}% winrate`}
+          } games and ${champions[0].winrate.toFixed(1)}% wins!`}
+          shareUrl={shareUrl}
+          onPrepareShare={handlePrepareShare}
+          isPreparing={isPreparingShare}
         />
       </div>
     </div>
@@ -221,9 +258,33 @@ export function PlayerOverviewCard({
   playerName,
   statistics,
   roleDistribution,
+  puuid,
 }: PlayerOverviewProps) {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isPreparingShare, setIsPreparingShare] = useState(false);
   const bgImageUrl = '/assets/background/Shurima.webp';
+  const cardType: ShareCardType = 'player-overview';
+
+  useEffect(() => {
+    setShareUrl(null);
+    setIsPreparingShare(false);
+  }, [puuid]);
+
+  const handlePrepareShare = useCallback(async () => {
+    if (shareUrl || isPreparingShare) return;
+    setIsPreparingShare(true);
+
+    try {
+      const url = await getOrCreateShareUrl({ puuid, cardType, ref });
+      setShareUrl(url);
+    } catch (error) {
+      console.error('[PlayerOverviewCard] Failed to prepare share image', error);
+      throw error;
+    } finally {
+      setIsPreparingShare(false);
+    }
+  }, [cardType, isPreparingShare, puuid, shareUrl]);
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -323,19 +384,45 @@ export function PlayerOverviewCard({
           Download
         </Button>
         <ShareButton
-          title={`I think ${statistics[0].value} ${statistics[0].title} with ${statistics[1].value} ${statistics[1].title} wasn't too bad`}
+          title={`My LoLo snapshot: ${statistics[0].value} ${statistics[0].title} and ${statistics[1].value} ${statistics[1].title}!`}
+          shareUrl={shareUrl}
+          onPrepareShare={handlePrepareShare}
+          isPreparing={isPreparingShare}
         />
       </div>
     </div>
   );
 }
 
-export function PlayerComparisonCard({ playerName, comparison }: PlayerComparisonProps) {
+export function PlayerComparisonCard({ playerName, comparison, puuid }: PlayerComparisonProps) {
   const { playerAnalysis, proPlayer } = comparison;
 
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isPreparingShare, setIsPreparingShare] = useState(false);
   const bgImageUrl = '/assets/background/Poro_King.webp';
   const proPlayerImageUrl = PLAYER_IMAGES[proPlayer.name.toLowerCase()];
+  const cardType: ShareCardType = 'pro-comparison';
+
+  useEffect(() => {
+    setShareUrl(null);
+    setIsPreparingShare(false);
+  }, [puuid]);
+
+  const handlePrepareShare = useCallback(async () => {
+    if (shareUrl || isPreparingShare) return;
+    setIsPreparingShare(true);
+
+    try {
+      const url = await getOrCreateShareUrl({ puuid, cardType, ref });
+      setShareUrl(url);
+    } catch (error) {
+      console.error('[PlayerComparisonCard] Failed to prepare share image', error);
+      throw error;
+    } finally {
+      setIsPreparingShare(false);
+    }
+  }, [cardType, isPreparingShare, puuid, shareUrl]);
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -451,14 +538,42 @@ export function PlayerComparisonCard({ playerName, comparison }: PlayerCompariso
         >
           Download
         </Button>
-        <ShareButton title={`I play like ${proPlayer.name} lol`} />
+        <ShareButton
+          title={`Apparently I channel ${proPlayer.name} every game!`}
+          shareUrl={shareUrl}
+          onPrepareShare={handlePrepareShare}
+          isPreparing={isPreparingShare}
+        />
       </div>
     </div>
   );
 }
 
-function ShareButton({ title }: { title: string }) {
-  const url = window.location.href;
+interface ShareButtonProps {
+  title: string;
+  shareUrl: string | null;
+  onPrepareShare: () => Promise<void> | void;
+  isPreparing: boolean;
+}
+
+function ShareButton({ title, shareUrl, onPrepareShare, isPreparing }: ShareButtonProps) {
+  const fallbackUrl =
+    typeof window !== 'undefined' && typeof window.origin === 'string'
+      ? `${window.origin}/analyze`
+      : '/analyze';
+  const targetUrl = shareUrl ?? fallbackUrl;
+  const appUrl =
+    typeof window !== 'undefined' && typeof window.origin === 'string'
+      ? `${window.origin}/analyze`
+      : 'https://d35c9ic8mbrtt5.cloudfront.net/analyze';
+  const shareText = `${title}\nTry LoLo yourself: ${appUrl}`;
+
+  const handleTriggerClick = () => {
+    if (shareUrl) return;
+    Promise.resolve(onPrepareShare()).catch((error) => {
+      console.error('[ShareButton] Failed to prepare share image', error);
+    });
+  };
 
   return (
     <Popover>
@@ -468,24 +583,44 @@ function ShareButton({ title }: { title: string }) {
           size={'lg'}
           color="accent"
           className="scale-125 flex items-center gap-2"
+          onClick={handleTriggerClick}
+          disabled={isPreparing}
         >
           <Share />
-          Share
+          {isPreparing ? 'Preparing...' : 'Share'}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-fit flex flex-col gap-2 bg-neutral-900/90 rounded-none text-white">
-        <TwitterShareButton url={url} title={title} className="flex items-center gap-4 w-full">
-          <XIcon size={36} />
-          <span>X</span>
-        </TwitterShareButton>
-        <FacebookShareButton url={url} title={title} className="flex items-center gap-4 w-full">
-          <FacebookIcon size={36} />
-          <span>Facebook</span>
-        </FacebookShareButton>
-        <RedditShareButton url={url} title={title} className="flex items-center gap-4 w-full">
-          <RedditIcon size={36} />
-          <span>Reddit</span>
-        </RedditShareButton>
+        {isPreparing && !shareUrl ? (
+          <div className="px-4 py-2 text-sm text-gray-300">Preparing preview...</div>
+        ) : (
+          <>
+            <TwitterShareButton
+              url={targetUrl}
+              title={shareText}
+              className="flex items-center gap-4 w-full"
+            >
+              <XIcon size={36} />
+              <span>X</span>
+            </TwitterShareButton>
+            <FacebookShareButton
+              url={targetUrl}
+              title={shareText}
+              className="flex items-center gap-4 w-full"
+            >
+              <FacebookIcon size={36} />
+              <span>Facebook</span>
+            </FacebookShareButton>
+            <RedditShareButton
+              url={targetUrl}
+              title={shareText}
+              className="flex items-center gap-4 w-full"
+            >
+              <RedditIcon size={36} />
+              <span>Reddit</span>
+            </RedditShareButton>
+          </>
+        )}
       </PopoverContent>
     </Popover>
   );
