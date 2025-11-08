@@ -10,7 +10,7 @@ import type { HttpInstance } from 'shared/src/lib/axios';
 
 import { getLatestVersion } from '../lib/utils/ddragon.util';
 import { createRegionalClient, createPlatformClient } from '../lib/utils/riot.util';
-import { getJSONFromS3, putObject } from '../lib/utils/s3.util';
+import { getJSONFromS3, isS3Enabled, putObject } from '../lib/utils/s3.util';
 
 export interface AccountSnapshot {
   fetchedAt: string;
@@ -71,6 +71,10 @@ export class AccountService {
   }
 
   async getCachedAccount(gameName: string, tagLine: string): Promise<AccountSnapshot | null> {
+    if (!isS3Enabled()) {
+      return null;
+    }
+
     const lookupKey = getLookupKey(this.region, gameName, tagLine);
     try {
       const lookup = await getJSONFromS3<{ puuid?: string }>(lookupKey);
@@ -121,6 +125,10 @@ export class AccountService {
   }
 
   async saveAccountSnapshot(snapshot: Omit<AccountSnapshot, 'fetchedAt'>): Promise<void> {
+    if (!isS3Enabled()) {
+      return;
+    }
+
     const payload: AccountSnapshot = {
       fetchedAt: new Date().toISOString(),
       ...snapshot,

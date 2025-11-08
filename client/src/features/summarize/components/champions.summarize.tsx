@@ -29,9 +29,9 @@ function ChampionsDesktop({ champions }: Props) {
 
     return (
       <div
-        className={`w-full flex justify-${isEven ? 'start' : 'end'} px-24 ${
-          i !== 0 ? 'lg:-mt-24' : ''
-        }`}
+        className={`w-full flex justify-${
+          isEven ? 'start' : 'end'
+        } scale-75 2xl:scale-100 2xl:px-24 ${i !== 0 ? 'lg:-mt-24' : ''}`}
       >
         <motion.div
           initial={{ opacity: 0, rotateY: isEven ? -90 : 90 }}
@@ -47,20 +47,20 @@ function ChampionsDesktop({ champions }: Props) {
             <img
               src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championId}_0.jpg`}
               alt={champ.name}
-              className="h-72 lg:h-full object-cover"
+              className="h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
             <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col">
               <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-4xl font-bold text-white font-[Bebas_Neue] leading-none">
+                <h2 className="text-4xl font-bold text-white font-bebas-neue leading-none">
                   {champ.name}
                 </h2>
                 <div className="flex items-center">
                   <img
                     src={`/assets/mastery_banner/Mastery_${
-                      champ.mastery!.level < 10 ? `${champ.mastery?.level}` : '10+'
-                    }_Banner.png`}
+                      champ.mastery!.level < 10 ? `${champ.mastery?.level}` : '10'
+                    }_Banner.webp`}
                     alt={`Mastery ${champ.mastery!.level}`}
                     width={52}
                   />
@@ -89,10 +89,10 @@ function ChampionsDesktop({ champions }: Props) {
   }
 
   return (
-    <section ref={ref} className="relative h-[380vh] w-full flex flex-col items-center">
+    <section ref={ref} className="relative h-[450vh] w-full flex flex-col items-center">
       <div className="sticky top-0 h-screen flex flex-col justify-center items-center text-center">
         <motion.div
-          className="flex flex-col justify-center items-center text-7xl lg:text-9xl font-bold font-[Bebas_Neue] tracking-wide"
+          className="flex flex-col justify-center items-center text-7xl 2xl:text-9xl font-bold font-bebas-neue tracking-wide"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -101,7 +101,7 @@ function ChampionsDesktop({ champions }: Props) {
           <p>Champions</p>
           <p>Played</p>
         </motion.div>
-        <p className="text-2xl lg:text-4xl mt-6 max-w-3xl">
+        <p className="text-3xl 2xl:text-4xl mt-6 max-w-xl 2xl:max-w-3xl">
           You've faced the Rift with countless champions, proving your adaptability and unshakable
           resolve.
         </p>
@@ -125,10 +125,10 @@ function ChampionsMobile({ champions }: Props) {
     <section className="relative w-full flex flex-col items-center py-8">
       {/* Header */}
       <div className="w-full px-4 mb-6">
-        <p className="text-center text-4xl font-bold tracking-wide text-white">
+        <p className="text-center text-5xl font-bold tracking-wide text-white font-bebas-neue">
           MOST PLAYED CHAMPIONS
         </p>
-        <p className="text-center text-base text-gray-300">
+        <p className="text-center text-sm text-gray-300">
           You've faced the Rift with countless champions, proving your adaptability and unshakable
           resolve.
         </p>
@@ -136,26 +136,53 @@ function ChampionsMobile({ champions }: Props) {
 
       {/* Champion List */}
       <div className="flex flex-col w-full px-4 divide-y divide-gray-700">
-        {champions.map((champ, i) => (
-          <div key={i} className="flex items-center gap-3 py-3">
-            <img
-              src={`https://ddragon.leagueoflegends.com/cdn/15.20.1/img/champion/${champ.name.replace(
-                /\s+/g,
-                '',
-              )}.png`}
-              alt={champ.name}
-              className="w-[52px] h-[52px] object-cover"
-            />
-            <div className="flex flex-col text-white">
-              <h2 className="text-lg font-[Bebas_Neue] tracking-wide">{champ.name}</h2>
-              <div className="flex gap-3 text-sm text-gray-300">
-                <p>{champ.matches} Matches</p>
-                <p>{champ.wins} Wins</p>
-                <p>{champ.winrate}% WR</p>
+        {champions.map((champ, i) => {
+          const championId = getChampionIdForDDragon(champ.name);
+
+          return (
+            <div key={i} className="flex items-center justify-between py-3">
+              {/* Left: Champion Icon + Info */}
+              <div className="flex items-center gap-3">
+                <img
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.20.1/img/champion/${championId}.png`}
+                  alt={champ.name}
+                  className="w-[52px] h-[52px] object-cover rounded-md"
+                />
+                <div className="flex flex-col text-white">
+                  <h2 className="text-lg font-bebas-neue tracking-wide leading-none">
+                    {champ.name}
+                  </h2>
+                  <div className="flex gap-2 text-xs text-gray-300">
+                    <p>{champ.matches} Matches</p>
+                    <p>{champ.wins} Wins</p>
+                    <p>{champ.winrate.toFixed(1)}% WR</p>
+                  </div>
+                </div>
               </div>
+
+              {/* Right: Mastery Banner */}
+              {champ.mastery && (
+                <div className="flex items-center gap-1">
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-white leading-tight">
+                      Lv {champ.mastery.level}
+                    </p>
+                    <p className="text-xs text-white/60">
+                      {champ.mastery.points.toLocaleString()} pts
+                    </p>
+                  </div>
+                  <img
+                    src={`/assets/mastery_banner/Mastery_${
+                      champ.mastery.level < 10 ? champ.mastery.level : '10'
+                    }_Banner.webp`}
+                    alt={`Mastery ${champ.mastery.level}`}
+                    className="w-10"
+                  />
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

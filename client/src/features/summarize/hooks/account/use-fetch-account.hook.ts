@@ -2,11 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { AccountDTO } from 'shared/src/types/account.type';
+import { AccountDTO, RankSummaryDTO } from 'shared/src/types/account.type';
 import type { ResponseWithData } from 'shared/src/types/response';
 
-interface AccountResponse extends AccountDTO {
+interface AccountDTOResponse extends AccountDTO {
   profilePict: string;
+  rank: RankSummaryDTO;
+  summonerLevel: number;
 }
 
 export const fetchAccount = async ({
@@ -17,9 +19,9 @@ export const fetchAccount = async ({
   gameName: string;
   tagName: string;
   region: string;
-}): Promise<AccountResponse> => {
+}): Promise<AccountDTOResponse> => {
   try {
-    const res = await axios.get<ResponseWithData<AccountResponse>>(
+    const res = await axios.get<ResponseWithData<AccountDTOResponse>>(
       `https://vncjbglssbpomo62pxk3rfkasu0ejovz.lambda-url.ap-southeast-1.on.aws/api/account/${gameName}/${tagName}`,
       {
         params: {

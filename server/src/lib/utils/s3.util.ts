@@ -13,16 +13,36 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'node:crypto';
 import { ENV } from '../../configs/env.config';
 
-// @ts-ignore
-const bucket = Resource.storage;
-const bucketName = bucket?.name;
-const bucketRegion = bucket?.region ?? ENV.aws.region;
+let bucketName: string | undefined;
+let bucketRegion: string | undefined;
 
-if (!bucketName) {
-  throw new Error('Missing S3 bucket name. Ensure the SST bucket is linked to this function.');
+try {
+  // @ts-ignore - SST injects resource metadata at runtime
+  const bucket = Resource.storage;
+  bucketName = bucket?.name;
+  bucketRegion = bucket?.region ?? ENV.aws.region;
+} catch (error) {
+  if (process.env.NODE_ENV === 'production') {
+    throw error;
+  }
+
+  bucketName = undefined;
+  bucketRegion = undefined;
 }
 
-const s3 = new S3Client({ region: bucketRegion });
+const s3 = bucketName ? new S3Client({ region: bucketRegion }) : null;
+
+export function isS3Enabled(): boolean {
+  return Boolean(bucketName && s3);
+}
+
+function getS3Context() {
+  if (!bucketName || !s3) {
+    throw new Error('S3 access is disabled in local development. Run through `sst dev` to enable.');
+  }
+
+  return { bucketName, s3 } as const;
+}
 
 export interface CreatePresignedUrlOptions {
   expiresIn?: number;
@@ -37,22 +57,26 @@ export interface PutObjectOptions {
 }
 
 export async function listObjects(prefix?: ListObjectsV2CommandInput['Prefix']) {
+  const { bucketName: activeBucketName, s3: client } = getS3Context();
+
   const command = new ListObjectsV2Command({
-    Bucket: bucketName,
+    Bucket: activeBucketName,
     Prefix: prefix,
   });
 
-  const response = await s3.send(command);
+  const response = await client.send(command);
   return response.Contents ?? [];
 }
 
 export async function getObject(key: string): Promise<GetObjectCommandOutput> {
+  const { bucketName: activeBucketName, s3: client } = getS3Context();
+
   const command = new GetObjectCommand({
-    Bucket: bucketName,
+    Bucket: activeBucketName,
     Key: key,
   });
 
-  return s3.send(command);
+  return client.send(command);
 }
 
 async function bodyToString(body: GetObjectCommandOutput['Body']): Promise<string> {
@@ -84,17 +108,19 @@ export async function getJSONFromS3<T>(key: string): Promise<T> {
 }
 
 export async function putObject(options: PutObjectOptions) {
+  const { bucketName: activeBucketName, s3: client } = getS3Context();
+
   const { key = randomUUID(), body, contentType, metadata } = options;
 
   const command = new PutObjectCommand({
-    Bucket: bucketName,
+    Bucket: activeBucketName,
     Key: key,
     Body: body,
     ContentType: contentType,
     Metadata: metadata,
   });
 
-  await s3.send(command);
+  await client.send(command);
   return { key };
 }
 
@@ -102,25 +128,29 @@ export async function createPresignedUploadUrl(
   key: string,
   options: CreatePresignedUrlOptions = {},
 ) {
+  const { bucketName: activeBucketName, s3: client } = getS3Context();
+
   const { expiresIn = 15 * 60, contentType } = options;
   const command = new PutObjectCommand({
-    Bucket: bucketName,
+    Bucket: activeBucketName,
     Key: key,
     ContentType: contentType,
   });
 
-  return getSignedUrl(s3, command, { expiresIn });
+  return getSignedUrl(client, command, { expiresIn });
 }
 
 export async function createPresignedDownloadUrl(
   key: string,
   options: CreatePresignedUrlOptions = {},
 ) {
+  const { bucketName: activeBucketName, s3: client } = getS3Context();
+
   const { expiresIn = 15 * 60 } = options;
   const command = new GetObjectCommand({
-    Bucket: bucketName,
+    Bucket: activeBucketName,
     Key: key,
   });
 
-  return getSignedUrl(s3, command, { expiresIn });
+  return getSignedUrl(client, command, { expiresIn });
 }

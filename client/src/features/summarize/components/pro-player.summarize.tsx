@@ -1,9 +1,12 @@
-import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
+
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 import ChartRadar from '@/ui/molecules/chart-radar.molecule';
-import { useInView } from 'react-intersection-observer';
+
 import type { usePostComparison } from '../hooks/comparison/use-post-comparison';
+import { PLAYER_IMAGES } from '@/core/constants/player.constant';
 
 interface Props {
   playerName: string;
@@ -239,8 +242,8 @@ export function ProPlayer({ playerName, comparisonMutatation }: Props) {
                   {/* Pro Player Comparison */}
                   <div className="flex flex-col items-center md:items-start gap-3 order-1 md:order-2">
                     <img
-                      src="https://img.redbull.com/images/c_limit,w_1500,h_1000/f_auto,q_auto/redbullcom/2020/12/16/c61kpj1fxidgnwiqgz2h/faker-t1-lol"
-                      alt="faker"
+                      src={PLAYER_IMAGES[comparison.proPlayer.name.toLowerCase()]}
+                      alt={comparison.proPlayer.name}
                       className="aspect-square object-cover w-40 h-40 md:w-52 md:h-52"
                     />
                     <h2 className="text-2xl md:text-3xl font-bold text-white">

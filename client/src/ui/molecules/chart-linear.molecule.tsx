@@ -21,7 +21,7 @@ export function ChartAreaLinear({ chartStatistics }: Props) {
 
   return (
     <Card className="lg:p-4">
-      <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-6 border-b border-gray-800">
+      <CardHeader className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 pb-6 border-b border-gray-800">
         <div>
           <CardTitle className="text-white text-2xl font-semibold tracking-tight">
             {currentConfig.label} Trend
@@ -33,7 +33,7 @@ export function ChartAreaLinear({ chartStatistics }: Props) {
           defaultValue={selectedOption.value}
           onValueChange={(value) => setSelectedOption(options.find((o) => o.value === value)!)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="max-w-60">
             <SelectValue placeholder={selectedOption.label} />
           </SelectTrigger>
           <SelectContent className="bg-[#1a1b1e] text-gray-200 border-gray-700">

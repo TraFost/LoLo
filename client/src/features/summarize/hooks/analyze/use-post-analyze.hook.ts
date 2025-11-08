@@ -1,12 +1,15 @@
 import axios from 'axios';
 import { useFetchAccount } from '../account/use-fetch-account.hook';
 import { useMutation } from '@tanstack/react-query';
-import { AnalyzeRequestDTO, AnalysisDTO } from 'shared/src/types/analyze.dto';
+import { AnalyzeRequestDTO, ImprovementResponseDTO } from 'shared/src/types/analyze.dto';
 import { ResponseWithData } from 'shared/src/types/response';
 
-const postAnalyze = async ({ puuid, region }: AnalyzeRequestDTO): Promise<AnalysisDTO> => {
+const postAnalyze = async ({
+  puuid,
+  region,
+}: AnalyzeRequestDTO): Promise<ImprovementResponseDTO> => {
   try {
-    const res = await axios.post<ResponseWithData<AnalysisDTO>>(
+    const res = await axios.post<ResponseWithData<ImprovementResponseDTO>>(
       'https://vncjbglssbpomo62pxk3rfkasu0ejovz.lambda-url.ap-southeast-1.on.aws/api/analyze/improvement',
       {
         puuid,

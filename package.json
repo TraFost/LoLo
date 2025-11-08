@@ -16,7 +16,8 @@
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "test": "turbo test",
-    "postinstall": "turbo build --filter=shared --filter=server"
+    "postinstall": "turbo build --filter=shared --filter=server",
+    "deploy": "pnpm run postinstall && npx sst deploy --stage production"
   },
   "keywords": [
     "pnpm",

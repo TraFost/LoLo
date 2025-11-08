@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/ui/atoms/button.atom';
-import { PLATFORM_HOST_MAP } from 'shared/src/constants/match.constant';
+import { REGION } from '../constants/region';
 import { useNavigate } from 'react-router';
 import { validateAndSplitRiotId } from '../utils/validate-riot-id';
 
 export function TagInput() {
   const [username, setUsername] = useState('');
-  const [region, setRegion] = useState(Object.keys(PLATFORM_HOST_MAP)[0]);
+  const [region, setRegion] = useState(Object.keys(REGION)[0]);
   const [invalidMessage, setInvalidMessage] = useState<string>('');
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ export function TagInput() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col items-center justify-center gap-12 bg-gradient-to-br from-black via-[#0a0b1f] to-[#02030a] text-white px-6 relative">
+    <div className="h-screen w-full flex flex-col items-center justify-center gap-12 bg-gradient-to-br from-black via-[#0a0b1f] to-[#02030a] text-white px-6 relative overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 blur-[100px] rounded-full animate-pulse"></div>
         <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-blue-600/10 blur-[80px] rounded-full animate-pulse delay-1000"></div>
@@ -79,19 +79,19 @@ export function TagInput() {
             <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-300 group-focus-within:w-full"></div>
           </div>
 
-          <div className="relative w-fit">
+          <div className="relative w-full lg:w-fit">
             <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              className="p-5 bg-slate-900/80 text-white focus:outline-none focus:bg-slate-900 transition-all duration-300 w-40 font-medium appearance-none cursor-pointer"
+              className="p-5 bg-slate-900/80 text-white focus:outline-none focus:bg-slate-900 transition-all duration-300 w-full font-medium appearance-none cursor-pointer"
             >
-              {Object.keys(PLATFORM_HOST_MAP).map((region) => (
+              {Object.entries(REGION).map(([region, name]) => (
                 <option value={region} key={region}>
-                  {region.toUpperCase()}
+                  {name}
                 </option>
               ))}
             </select>
-            <div className="absolute inset-0 pointer-events-none flex items-center justify-end pr-4">
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-end pr-2">
               <div className="w-2 h-2 border-r-2 border-b-2 border-white rotate-45 transform"></div>
             </div>
           </div>

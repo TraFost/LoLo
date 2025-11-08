@@ -9,37 +9,75 @@ import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 import { motion } from 'motion/react';
-
-interface RoleDistributionProps {
-  roleDistribution: RoleDistribution[];
-}
+import { AnalysisDTO, PracticePlanPayload } from 'shared/src/types/analyze.dto';
 
 interface Props {
   gameplayData: GameplayData;
 }
 
+interface RoleDistributionProps {
+  roleDistribution: RoleDistribution[];
+}
+
+interface AnalyzeProps {
+  isPending: boolean;
+  isError: boolean;
+  error?: string;
+}
+
+interface LoLoAnalysisProps extends AnalyzeProps {
+  analysis: AnalysisDTO;
+}
+
+interface PracticePlanProps {
+  practicePlan: PracticePlanPayload;
+}
+
 export function GameplayOverview({ gameplayData }: Props) {
   const { chartStatistics, roleDistribution } = gameplayData;
 
+  const { ref, inView } = useInView({ triggerOnce: true });
+  const { data, mutate, isPending, isError, error } = usePostAnalyze();
+
+  useEffect(() => {
+    if (inView) {
+      mutate();
+    }
+  }, [inView, mutate]);
+
+  const { analysis, practicePlan } = data ?? {};
+
   return (
-    <section>
+    <section ref={ref}>
       <div className="my-24 mt-40 lg:px-52">
         <p className="text-5xl lg:text-7xl font-bold text-center">
-          now, let's see how your gameplay really looks!
+          now, let's see how your analysis really looks!
         </p>
       </div>
-      <div className="mt-16 mx-4 lg:mx-24 flex flex-col lg:flex-row gap-6">
-        <div className="basis-2/3">
-          <div className="lg:w-3/4 mx-auto flex flex-col gap-12">
-            <ChartAreaLinear chartStatistics={chartStatistics} />
+      <div className="mt-16 mx-4 lg:mx-24 flex flex-col gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-start">
+          <div className="basis-2/3">
+            <div className="lg:w-3/4 mx-auto flex flex-col gap-12">
+              <ChartAreaLinear chartStatistics={chartStatistics} />
 
-            {/* Role Distribution Section */}
-            <RoleDistributionSection roleDistribution={roleDistribution} />
+              {/* Role Distribution Section */}
+              <RoleDistributionSection roleDistribution={roleDistribution} />
+            </div>
           </div>
-        </div>
 
-        {/* LoLo Analysis Section */}
-        <LoLoAnalysis />
+          {/* LoLo Analysis Section */}
+          <LoLoAnalysis
+            analysis={analysis!}
+            error={error?.message}
+            isError={isError}
+            isPending={isPending}
+          />
+        </div>
+        {practicePlan && (
+          <div>
+            <PracticePlan practicePlan={practicePlan} />
+          </div>
+        )}
       </div>
     </section>
   );
@@ -50,15 +88,13 @@ function RoleDistributionSection({ roleDistribution }: RoleDistributionProps) {
   return (
     <div className="space-y-6">
       <p className="text-2xl font-semibold">Role Distribution</p>
-      <div className="w-full flex flex-col lg:flex-row gap-4">
+      <div className="w-full flex flex-col xl:flex-row gap-4">
         <DonutChart data={roleDistribution} totalValues={total} />
         <div className="w-full space-y-3">
           {roleDistribution.map((role) => (
-            <div key={role.role} className="flex items-center w-full">
-              <div className="w-2/12 pr-4">
-                <p className="text-sm truncate">{role.role}</p>
-              </div>
-              <div className="flex items-center gap-4 w-2/3">
+            <div key={role.role} className="flex flex-col w-full">
+              <p className="text-sm truncate">{role.role}</p>
+              <div className="flex items-center gap-4 w-full">
                 <Progress value={getPercentage(role.value)} className="flex-1" />
                 <p className="text-sm w-12 text-right">{getPercentage(role.value).toFixed(1)}%</p>
               </div>
@@ -70,18 +106,9 @@ function RoleDistributionSection({ roleDistribution }: RoleDistributionProps) {
   );
 }
 
-function LoLoAnalysis() {
-  const { ref, inView } = useInView({ triggerOnce: true });
-  const { data: gameplay, mutate, isPending, isError, error } = usePostAnalyze();
-
-  useEffect(() => {
-    if (inView) {
-      mutate();
-    }
-  }, [inView, mutate]);
-
+function LoLoAnalysis({ analysis, error, isError, isPending }: LoLoAnalysisProps) {
   return (
-    <div className="w-full flex-shrink-0 max-w-md" ref={ref}>
+    <div className="w-full flex-shrink-0 max-w-md">
       <h3 className="text-3xl font-semibold text-white mb-6 border-b border-gray-700 pb-3">
         LoLo Analysis
       </h3>
@@ -123,20 +150,20 @@ function LoLoAnalysis() {
             className="flex flex-col items-center justify-center gap-2 py-20 text-center"
           >
             <p className="text-red-400 font-semibold text-lg">Something went wrong</p>
-            <p className="text-slate-400 text-sm max-w-md">{error.message}</p>
+            <p className="text-slate-400 text-sm max-w-md">{error}</p>
           </motion.div>
         )}
 
-        {gameplay && (
+        {analysis && (
           <>
             {/* Overall Summary */}
-            <p className="text-base leading-relaxed text-gray-300">{gameplay.analysis.overall}</p>
+            <p className="text-base leading-relaxed text-gray-300">{analysis.analysis.overall}</p>
 
             {/* Strength Section */}
             <div>
               <p className="text-lg font-semibold text-gray-100 mb-2">What Makes You Strong</p>
               <div className="flex flex-col gap-2">
-                {gameplay.analysis.strengths.map((point) => (
+                {analysis.analysis.strengths.map((point) => (
                   <div
                     key={point}
                     className="flex gap-3 items-center bg-gray-800 px-3 py-2 border border-gray-700"
@@ -152,7 +179,7 @@ function LoLoAnalysis() {
             <div>
               <p className="text-lg font-semibold text-gray-100 mb-2">Areas for Improvement</p>
               <div className="flex flex-col gap-3">
-                {gameplay.analysis.improvement.map((point) => (
+                {analysis.analysis.improvement.map((point) => (
                   <div key={point} className="bg-gray-800 px-4 py-3 border border-gray-700">
                     <p className="text-gray-300 text-sm leading-relaxed">{point}</p>
                   </div>
@@ -163,5 +190,74 @@ function LoLoAnalysis() {
         )}
       </div>
     </div>
+  );
+}
+
+function PracticePlan({ practicePlan }: PracticePlanProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      viewport={{ once: true }}
+      className="w-full max-w-6xl mx-auto bg-gray-900 border border-gray-700 p-12 space-y-12"
+    >
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <h3 className="text-4xl font-bold text-white tracking-wide">Practice Plan</h3>
+        <p className="text-gray-400 text-base">Your personal improvement roadmap</p>
+      </div>
+
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_2px_2fr] gap-8">
+        {/* Focus Section */}
+        <div className="space-y-4">
+          <p className="text-xl font-semibold text-gray-100">Key Focus Areas</p>
+          <ul className="space-y-2">
+            {practicePlan.focus.map((focus) => (
+              <li
+                key={focus}
+                className="py-2 px-3 bg-primary/5 border border-primary/75 text-gray-200 font-medium tracking-wide"
+              >
+                {focus}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Divider */}
+        <div className="hidden lg:block w-px bg-gray-700/70" />
+
+        {/* Session Section */}
+        <div className="space-y-8">
+          <p className="text-xl font-semibold text-gray-100">Training Sessions</p>
+          {practicePlan.sessions.map((session, idx) => (
+            <motion.div
+              key={session.title}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: idx * 0.1 }}
+              viewport={{ once: true }}
+              className="border border-gray-700 bg-gray-800 p-6 space-y-3"
+            >
+              <div className="flex flex-col md:flex-row lg:items-center justify-between">
+                <h4 className="text-lg font-semibold text-white">{session.title}</h4>
+                <span className="text-sm text-gray-400">{session.duration}</span>
+              </div>
+              <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                {session.checklist.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Notes Section */}
+      <div className="border-t border-gray-700 pt-4 text-center">
+        <p className="text-sm text-gray-400 italic">{practicePlan.notes}</p>
+      </div>
+    </motion.div>
   );
 }

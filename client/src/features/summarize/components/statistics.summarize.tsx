@@ -10,7 +10,7 @@ export function Statistics({ statistics }: Props) {
   return (
     <div className="w-full">
       <motion.h2
-        className="text-5xl lg:text-7xl font-bold my-24 text-center"
+        className="text-4xl md:text-5xl lg:text-7xl font-bold my-24 text-center"
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
@@ -33,7 +33,7 @@ function HorizontalScroll({ statistics }: Props) {
   const x = useTransform(scrollYProgress, [0, 1], ['0%', '-80%']);
 
   return (
-    <section ref={ref} className="relative h-[700vh]">
+    <section ref={ref} className="relative h-[400vh] md:h-[550vh] lg:h-[700vh]">
       <div className="sticky top-0 h-screen flex items-center overflow-hidden">
         <motion.div style={{ x }} className="flex items-center">
           {statistics.map((stat, i) => (

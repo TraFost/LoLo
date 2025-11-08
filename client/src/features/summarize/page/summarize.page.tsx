@@ -50,6 +50,8 @@ export function SummarizePage() {
             tagName={accountData.tagLine}
             championName={champions[0].name}
             profilePict={accountData.profilePict}
+            rank={accountData.rank}
+            summonerLevel={accountData.summonerLevel}
           />
           <Statistics statistics={statistics.statistics} />
           <ChampionsSummarize champions={champions} />

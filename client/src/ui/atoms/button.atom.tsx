@@ -43,7 +43,7 @@ const buttonVariants = cva(
       },
     ],
     defaultVariants: {
-      variant: 'offset',
+      variant: 'flat',
       color: 'primary',
       size: 'default',
     },

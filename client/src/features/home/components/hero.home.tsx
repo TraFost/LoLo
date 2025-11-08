@@ -5,6 +5,7 @@ import { Description } from '@/ui/atoms/typography/description.atom';
 
 import { createStaggerContainer, fadeIn, fadeInUp } from '@/lib/utils/motion.util';
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
+import { Link } from 'react-router';
 
 const heroContainer = createStaggerContainer(0.15, 0.12);
 
@@ -44,22 +45,24 @@ export function Hero() {
               whileHover={!reduce ? { y: -4, scale: 1.02 } : undefined}
               whileTap={!reduce ? { scale: 0.98 } : undefined}
             >
-              <Button
-                variant="offset"
-                color="primary"
-                size="lg"
-                className="w-full sm:w-auto"
-                aria-label="Analyze my matches"
-              >
-                Analyze My Matches
-              </Button>
+              <Link to="/analyze">
+                <Button
+                  variant="flat"
+                  color="primary"
+                  size="lg"
+                  className="w-full sm:w-auto"
+                  aria-label="Analyze my matches"
+                >
+                  Analyze My Matches
+                </Button>
+              </Link>
             </motion.div>
             <motion.div
               whileHover={!reduce ? { y: -4, scale: 1.02 } : undefined}
               whileTap={!reduce ? { scale: 0.98 } : undefined}
             >
               <Button
-                variant="offset"
+                variant="flat"
                 color="accent"
                 size="lg"
                 className="w-full sm:w-auto"
