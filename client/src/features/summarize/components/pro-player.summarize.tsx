@@ -1,33 +1,29 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { useEffect } from 'react';
-import { useInView } from 'react-intersection-observer';
 
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 import ChartRadar from '@/ui/molecules/chart-radar.molecule';
 
-import type { usePostComparison } from '../hooks/comparison/use-post-comparison';
 import { PLAYER_IMAGES } from '@/core/constants/player.constant';
+import { useQuery } from '@tanstack/react-query';
+import { AnalyzeResponse } from '@/types/analyze';
 
 interface Props {
   playerName: string;
-  comparisonMutatation: ReturnType<typeof usePostComparison>;
+  puuid: string;
+  region: string;
 }
 
-export function ProPlayer({ playerName, comparisonMutatation }: Props) {
-  const { ref, inView } = useInView({ triggerOnce: true });
-  const { data: comparison, mutate, isPending, isError, error } = comparisonMutatation;
+export function ProPlayer({ playerName, puuid, region }: Props) {
+  const { data, error, isError, isPending } = useQuery<AnalyzeResponse>({
+    queryKey: ['analyze', puuid, region],
+    queryFn: () => Promise.reject('disabled'),
+    enabled: false,
+  });
 
-  useEffect(() => {
-    if (inView) {
-      mutate();
-    }
-  }, [inView, mutate]);
+  const { comparison } = data ?? {};
 
   return (
-    <section
-      className="relative min-h-screen w-full overflow-hidden mt-24 grid grid-cols-1 lg:grid-cols-2"
-      ref={ref}
-    >
+    <section className="relative min-h-screen w-full overflow-hidden mt-24 grid grid-cols-1 lg:grid-cols-2">
       {/* Divider (desktop only) */}
       <div className="absolute hidden lg:block top-0 left-1/2 w-[3px] h-full bg-gradient-to-b from-blue-400 to-transparent origin-top-left transform -skew-x-6" />
 

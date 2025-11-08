@@ -5,25 +5,25 @@ import { Description } from '@/ui/atoms/typography/description.atom';
 import { Header } from '@/ui/atoms/typography/header.atom';
 import { YouTubePlayer } from '@/ui/molecules/youtube-video-player';
 
-import { createStaggerContainer, fadeInUp, fadeIn, scaleIn } from '@/lib/utils/motion.util'; // + add these
+import { createStaggerContainer, fadeInUp, fadeIn, scaleIn } from '@/lib/utils/motion.util';
 
 const featuresContainer = createStaggerContainer(0.05, 0.15);
 
 const FEATURES = [
   {
-    icon: <LineChart className="w-6 h-6" />,
-    title: 'Season Arc Card',
-    desc: 'See your year in a single glance. LoLo turns your match history into a clear story of progress, highlighting one theme, one trend, and one takeaway.',
+    icon: <Brain className="w-6 h-6" />,
+    title: 'AI Reflection Cards',
+    desc: 'LoLo distills match timelines into strengths, focus areas, and one next habit using Bedrock-powered coach prompts.',
   },
   {
-    icon: <Brain className="w-6 h-6" />,
-    title: 'Post-Match Debrief',
-    desc: 'Get three insights, one habit to practice, and a coach line after each game. No noise, no data dumps—just what helps you improve next round.',
+    icon: <LineChart className="w-6 h-6" />,
+    title: 'Role Trend Dashboards',
+    desc: 'Track monthly momentum, KP, CS, damage, and vision trends for your main roles without juggling dozens of charts.',
   },
   {
     icon: <Trophy className="w-6 h-6" />,
-    title: 'Pro Playstyle Match',
-    desc: 'Discover which pro player’s gameplay mirrors yours. LoLo compares your stats to top pros and reveals how your style stacks up.',
+    title: 'Shareable Recap Posters',
+    desc: 'Export recap banners and pro comparisons to PNG so you can celebrate wins or plan scrims with the team.',
   },
 ];
 
@@ -40,10 +40,10 @@ export function Features() {
       <div className="max-w-7xl mx-auto px-4 gap-16 justify-between md:px-8 lg:flex">
         <motion.div variants={fadeInUp}>
           <div className="max-w-xl space-y-3">
-            <Header tag="h3" text="Features" />
+            <Header tag="h3" text="What LoLo Delivers" />
             <Description
               tag="p"
-              text="We stripped away the clutter. All that’s left is what helps you grow."
+              text="Every screen is tuned for actionable insight—no stat dumps, just growth signals."
             />
           </div>
 
@@ -55,7 +55,7 @@ export function Features() {
                     {item.icon}
                   </div>
                   <div>
-                    <Header tag="h3" text={item.title} className="text-2xl!" />
+                    <Header tag="h3" text={item.title} className="text-2xl" />
                     <Description tag="p" text={item.desc} className="min-w-full text-gray-300" />
                   </div>
                 </motion.li>

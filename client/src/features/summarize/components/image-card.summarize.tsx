@@ -13,18 +13,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/ui/atoms/carousel';
-import {
-  FacebookIcon,
-  FacebookShareButton,
-  TwitterShareButton,
-  RedditShareButton,
-  XIcon,
-  RedditIcon,
-} from 'react-share';
+import { FacebookIcon, RedditIcon, XIcon } from 'react-share';
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/atoms/popover';
 import { Share } from 'lucide-react';
 
 import { PLAYER_IMAGES } from '@/core/constants/player.constant';
+import { ENV } from '@/core/configs/env.config';
 import { getOrCreateShareUrl } from '../utils/share/get-or-create-share-url.util';
 
 interface Props {
@@ -557,16 +551,63 @@ interface ShareButtonProps {
 }
 
 function ShareButton({ title, shareUrl, onPrepareShare, isPreparing }: ShareButtonProps) {
-  const fallbackUrl =
-    typeof window !== 'undefined' && typeof window.origin === 'string'
-      ? `${window.origin}/analyze`
-      : '/analyze';
-  const targetUrl = shareUrl ?? fallbackUrl;
-  const appUrl =
-    typeof window !== 'undefined' && typeof window.origin === 'string'
-      ? `${window.origin}/analyze`
-      : 'https://d35c9ic8mbrtt5.cloudfront.net/analyze';
-  const shareText = `${title}\nTry LoLo yourself: ${appUrl}`;
+  const appOrigin = ENV.APP_URL;
+  const shareOrigin = ENV.SHARE_BASE_URL;
+
+  const sanitizeShareUrl = (value: string | null): string | null => {
+    if (!value) {
+      return null;
+    }
+
+    try {
+      const parsed = new URL(value, shareOrigin);
+      const base = new URL(shareOrigin);
+      const isLocalHost = ['localhost', '127.0.0.1'].includes(base.hostname);
+
+      parsed.protocol = base.protocol;
+      parsed.hostname = base.hostname;
+      parsed.port = isLocalHost ? base.port : '';
+
+      return parsed.toString();
+    } catch (error) {
+      console.error('[ShareButton] Failed to sanitize share URL', error);
+      return value;
+    }
+  };
+
+  const sanitizedShareUrl = sanitizeShareUrl(shareUrl);
+  const appAnalyzeUrl = `${appOrigin}/analyze`;
+  const fallbackUrl = appAnalyzeUrl;
+  const targetUrl = sanitizedShareUrl ?? fallbackUrl;
+
+  const shareCopy = sanitizedShareUrl
+    ? `${title} ${sanitizedShareUrl}\n\nTry LoLo yourself: ${appAnalyzeUrl}`
+    : `${title}\n\nTry LoLo yourself: ${appAnalyzeUrl}`;
+
+  const openShareWindow = (url: string) => {
+    const features = 'noopener,noreferrer,width=600,height=600';
+    window.open(url, '_blank', features);
+  };
+
+  const shareOnTwitter = () => {
+    const intent = new URL('https://twitter.com/intent/tweet');
+    intent.searchParams.set('text', shareCopy);
+    openShareWindow(intent.toString());
+  };
+
+  const shareOnFacebook = () => {
+    const intent = new URL('https://www.facebook.com/sharer/sharer.php');
+    intent.searchParams.set('u', targetUrl);
+    intent.searchParams.set('quote', shareCopy);
+    openShareWindow(intent.toString());
+  };
+
+  const shareOnReddit = () => {
+    const intent = new URL('https://www.reddit.com/submit');
+    intent.searchParams.set('url', targetUrl);
+    intent.searchParams.set('title', shareCopy);
+    openShareWindow(intent.toString());
+  };
 
   const handleTriggerClick = () => {
     if (shareUrl) return;
@@ -595,30 +636,30 @@ function ShareButton({ title, shareUrl, onPrepareShare, isPreparing }: ShareButt
           <div className="px-4 py-2 text-sm text-gray-300">Preparing preview...</div>
         ) : (
           <>
-            <TwitterShareButton
-              url={targetUrl}
-              title={shareText}
-              className="flex items-center gap-4 w-full"
+            <button
+              type="button"
+              onClick={shareOnTwitter}
+              className="flex items-center gap-4 w-full text-left"
             >
               <XIcon size={36} />
               <span>X</span>
-            </TwitterShareButton>
-            <FacebookShareButton
-              url={targetUrl}
-              title={shareText}
-              className="flex items-center gap-4 w-full"
+            </button>
+            <button
+              type="button"
+              onClick={shareOnFacebook}
+              className="flex items-center gap-4 w-full text-left"
             >
               <FacebookIcon size={36} />
               <span>Facebook</span>
-            </FacebookShareButton>
-            <RedditShareButton
-              url={targetUrl}
-              title={shareText}
-              className="flex items-center gap-4 w-full"
+            </button>
+            <button
+              type="button"
+              onClick={shareOnReddit}
+              className="flex items-center gap-4 w-full text-left"
             >
               <RedditIcon size={36} />
               <span>Reddit</span>
-            </RedditShareButton>
+            </button>
           </>
         )}
       </PopoverContent>

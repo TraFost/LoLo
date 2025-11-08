@@ -5,12 +5,12 @@ const FAQS = [
   {
     question: 'Is my Riot account data safe?',
     answer:
-      'Yes. LoLo only uses Riot’s official API, so your data stays private and never leaves your control. We don’t store or share match information.',
+      'Yes. LoLo only uses Riot’s official API, so your data stays private and never leaves your control. We cache a minimal subset to generate reflections and purge it on request.',
   },
   {
     question: 'Do I need to play ranked to use LoLo?',
     answer:
-      'No. LoLo works with any mode that provides match data. Ranked players just get clearer trends since their performance is more consistent.',
+      'Yes. LoLo currently ingests only Ranked Solo/Duo games so we can keep comparisons consistent and trend lines meaningful.',
   },
   {
     question: 'What makes LoLo different from other stat trackers?',
