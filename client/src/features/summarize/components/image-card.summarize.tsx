@@ -23,6 +23,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/atoms/popover';
 import { Share } from 'lucide-react';
 
+import { PLAYER_IMAGES } from '@/core/constants/player.constant';
+
 interface Props {
   children: React.ReactNode;
 }
@@ -333,8 +335,7 @@ export function PlayerComparisonCard({ playerName, comparison }: PlayerCompariso
 
   const ref = useRef(null);
   const bgImageUrl = '/assets/background/Poro_King.webp';
-  const proPlayerImageUrl =
-    'https://img.redbull.com/images/c_limit,w_1500,h_1000/f_auto,q_auto/redbullcom/2020/12/16/c61kpj1fxidgnwiqgz2h/faker-t1-lol';
+  const proPlayerImageUrl = PLAYER_IMAGES[proPlayer.name.toLowerCase()];
 
   return (
     <div className="flex flex-col items-center gap-4">
