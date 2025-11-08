@@ -10,7 +10,6 @@ import { StatusCodes } from 'shared/src/http-status';
 import accountRoutes from './routes/account.route';
 import statisticsRoutes from './routes/statistics.route';
 import analyzeRoutes from './routes/analyze.route';
-import proRoutes from './routes/pro.route';
 
 import { CORS } from './configs/cors.config';
 import { rateLimiterConfig } from './configs/rate-limiter.config';
