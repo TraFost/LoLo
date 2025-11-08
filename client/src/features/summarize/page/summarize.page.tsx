@@ -61,16 +61,19 @@ export function SummarizePage() {
             <MostPlayedChampionsCard
               playerName={`${accountData.gameName}#${accountData.tagLine}`}
               champions={champions}
+              puuid={accountData.puuid}
             />
             <PlayerOverviewCard
               playerName={`${accountData.gameName}#${accountData.tagLine}`}
               statistics={statistics.statistics}
               roleDistribution={statistics.gameplay.roleDistribution}
+              puuid={accountData.puuid}
             />
             {comparison.data && (
               <PlayerComparisonCard
                 playerName={`${accountData.gameName}#${accountData.tagLine}`}
                 comparison={comparison.data}
+                puuid={accountData.puuid}
               />
             )}
           </ImageCardSection>
