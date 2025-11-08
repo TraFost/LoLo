@@ -12,7 +12,8 @@ import {
 import { useFetchStatistics } from '../hooks/statistics/use-fetch-statistics.hook';
 import { fillChampions } from '../utils/champion/fill-champions.util';
 import { RenderState } from '../components/render-state.summarize';
-import { usePostComparison } from '../hooks/comparison/use-post-comparison';
+import { usePostAnalyze } from '../hooks/analyze/use-post-analyze.hook';
+import { useEffect } from 'react';
 
 export function SummarizePage() {
   const {
@@ -25,11 +26,18 @@ export function SummarizePage() {
     isAccountError,
     isAccountLoading,
     accountError,
+    region,
   } = useFetchStatistics();
 
-  const comparison = usePostComparison();
+  const { mutate, data: analyzeData } = usePostAnalyze();
 
   const champions = fillChampions(statistics?.champions ?? [], 5);
+
+  useEffect(() => {
+    if (accountData && statistics && region) {
+      mutate();
+    }
+  }, [accountData, statistics, region]);
 
   return (
     <RenderState
@@ -43,7 +51,7 @@ export function SummarizePage() {
           : accountError || (typeof error === 'object' ? error?.message : error)
       }
     >
-      {accountData && statistics ? (
+      {accountData && statistics && region ? (
         <div className="flex flex-col items-center bg-gray-950 text-white">
           <RecapIntro
             gameName={accountData.gameName}
@@ -55,28 +63,32 @@ export function SummarizePage() {
           />
           <Statistics statistics={statistics.statistics} />
           <ChampionsSummarize champions={champions} />
-          <GameplayOverview gameplayData={statistics.gameplay} />
-          <ProPlayer playerName={accountData.gameName} comparisonMutatation={comparison} />
-          <ImageCardSection>
-            <MostPlayedChampionsCard
-              playerName={`${accountData.gameName}#${accountData.tagLine}`}
-              champions={champions}
-              puuid={accountData.puuid}
-            />
-            <PlayerOverviewCard
-              playerName={`${accountData.gameName}#${accountData.tagLine}`}
-              statistics={statistics.statistics}
-              roleDistribution={statistics.gameplay.roleDistribution}
-              puuid={accountData.puuid}
-            />
-            {comparison.data && (
-              <PlayerComparisonCard
+          <GameplayOverview
+            gameplayData={statistics.gameplay}
+            puuid={accountData.puuid}
+            region={region}
+          />
+          <ProPlayer playerName={accountData.gameName} puuid={accountData.puuid} region={region} />
+          {analyzeData && (
+            <ImageCardSection>
+              <MostPlayedChampionsCard
                 playerName={`${accountData.gameName}#${accountData.tagLine}`}
-                comparison={comparison.data}
+                champions={champions}
                 puuid={accountData.puuid}
               />
-            )}
-          </ImageCardSection>
+              <PlayerOverviewCard
+                playerName={`${accountData.gameName}#${accountData.tagLine}`}
+                statistics={statistics.statistics}
+                roleDistribution={statistics.gameplay.roleDistribution}
+                puuid={accountData.puuid}
+              />
+              <PlayerComparisonCard
+                playerName={`${accountData.gameName}#${accountData.tagLine}`}
+                comparison={analyzeData.comparison}
+                puuid={accountData.puuid}
+              />
+            </ImageCardSection>
+          )}
         </div>
       ) : null}
     </RenderState>

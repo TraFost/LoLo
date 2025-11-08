@@ -5,10 +5,19 @@ import axios, {
   type AxiosRequestConfig,
 } from 'axios';
 import qs from 'qs';
-import http from 'node:http';
-import https from 'node:https';
-
 import { sleep } from './utils';
+
+let httpAgent: any;
+let httpsAgent: any;
+declare const window: any;
+
+if (typeof window === 'undefined') {
+  // Node.js only
+  const http = require('node:http');
+  const https = require('node:https');
+  httpAgent = new http.Agent({ keepAlive: true, maxSockets: 128 });
+  httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 128 });
+}
 
 export type HttpInstance = AxiosInstance;
 
@@ -33,11 +42,6 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
     isClient = false,
   } = opts;
 
-  const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 128 });
-  const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 128 });
-
-  let agents = isClient && { httpAgent, httpsAgent };
-
   const instance = axios.create({
     baseURL,
     timeout: timeoutMs,
@@ -47,7 +51,7 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
       'User-Agent': userAgent,
       ...defaultHeaders,
     },
-    ...agents,
+    ...(isClient ? {} : { httpAgent, httpsAgent }), // skip agent kalau di browser
     paramsSerializer: { serialize: (params) => qs.stringify(params, { arrayFormat: 'repeat' }) },
     validateStatus: (s) => s >= 200 && s < 300,
     decompress: true,
