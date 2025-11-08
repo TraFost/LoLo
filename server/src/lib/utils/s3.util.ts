@@ -32,6 +32,10 @@ try {
 
 const s3 = bucketName ? new S3Client({ region: bucketRegion }) : null;
 
+export function isS3Enabled(): boolean {
+  return Boolean(bucketName && s3);
+}
+
 function getS3Context() {
   if (!bucketName || !s3) {
     throw new Error('S3 access is disabled in local development. Run through `sst dev` to enable.');
