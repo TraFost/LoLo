@@ -2,6 +2,7 @@ import { Resource } from 'sst';
 
 import {
   GetObjectCommand,
+  HeadObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
   type GetObjectCommandOutput,
@@ -79,6 +80,28 @@ export async function getObject(key: string): Promise<GetObjectCommandOutput> {
   return client.send(command);
 }
 
+export async function headObject(key: string): Promise<boolean> {
+  const { bucketName: activeBucketName, s3: client } = getS3Context();
+
+  const command = new HeadObjectCommand({
+    Bucket: activeBucketName,
+    Key: key,
+  });
+
+  try {
+    await client.send(command);
+    return true;
+  } catch (error: unknown) {
+    const code = (error as any)?.Code ?? (error as any)?.code ?? (error as any)?.name ?? '';
+    const status = (error as any)?.$metadata?.httpStatusCode;
+    if (code === 'NotFound' || code === 'NoSuchKey' || status === 404) {
+      return false;
+    }
+
+    throw error;
+  }
+}
+
 async function bodyToString(body: GetObjectCommandOutput['Body']): Promise<string> {
   if (!body) return '';
   if (typeof body === 'string') return body;
@@ -153,4 +176,19 @@ export async function createPresignedDownloadUrl(
   });
 
   return getSignedUrl(client, command, { expiresIn });
+}
+
+export function getPublicObjectUrl(key: string): string {
+  if (!bucketName) {
+    throw new Error('S3 access is disabled.');
+  }
+
+  const region = bucketRegion || process.env.AWS_REGION || 'us-east-1';
+  const normalizedKey = key.startsWith('/') ? key.slice(1) : key;
+  const base =
+    region && region !== 'us-east-1'
+      ? `https://${bucketName}.s3.${region}.amazonaws.com`
+      : `https://${bucketName}.s3.amazonaws.com`;
+
+  return `${base}/${normalizedKey}`;
 }
