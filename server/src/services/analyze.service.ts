@@ -16,11 +16,13 @@ import type {
 import { normalizeRole } from '../lib/utils/helper.util';
 import { createRegionalClient } from '../lib/utils/riot.util';
 import { getJSONFromS3, isS3Enabled, putObject } from '../lib/utils/s3.util';
+import { riotRateGate, withRiotRateGate } from '../lib/utils/rate-limiter.util';
 
 export class AnalyzeService {
   private regionalClient: HttpInstance;
   private readonly accountService: AccountService;
   private readonly region: PlatformRegion;
+  private gate = riotRateGate;
 
   constructor(platformRegion: PlatformRegion) {
     this.regionalClient = createRegionalClient(platformRegion);
@@ -160,11 +162,14 @@ export class AnalyzeService {
     const url = `/lol/match/v5/matches/by-puuid/${puuid}/ids`;
     const params = new URLSearchParams({
       start: '0',
-      count: '15',
+      count: '5',
       queue: RANKED_MATCH,
     });
 
-    const res = await this.regionalClient.get<string[]>(`${url}?${params.toString()}`);
+    const res = await withRiotRateGate(
+      () => this.regionalClient.get<string[]>(`${url}?${params.toString()}`),
+      this.gate,
+    );
     return res.data ?? [];
   }
 
@@ -180,7 +185,7 @@ export class AnalyzeService {
   private async getMatchDetail(matchId: string): Promise<MatchDTO | null> {
     const url = `/lol/match/v5/matches/${matchId}`;
     try {
-      const res = await this.regionalClient.get<MatchDTO>(url);
+      const res = await withRiotRateGate(() => this.regionalClient.get<MatchDTO>(url), this.gate);
       return res.data;
     } catch (e: any) {
       console.warn(`Failed to fetch match ${matchId}:`, e.message);
@@ -191,7 +196,7 @@ export class AnalyzeService {
   private async getMatchTimeline(matchId: string): Promise<any> {
     const url = `/lol/match/v5/matches/${matchId}/timeline`;
     try {
-      const res = await this.regionalClient.get(url);
+      const res = await withRiotRateGate(() => this.regionalClient.get(url), this.gate);
       return res.data;
     } catch (e: any) {
       console.warn(`Failed to fetch timeline ${matchId}:`, e.message);

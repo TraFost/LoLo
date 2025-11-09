@@ -23,7 +23,7 @@ const postComparison = async (payload: AnalyzeRequestDTO): Promise<ProComparison
     '/analyze/pro-comparison',
     payload,
   );
-  console.log(res.data);
+
   if (!res.data.success) throw new Error(res.data.message);
   return res.data.data;
 };

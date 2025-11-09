@@ -80,6 +80,15 @@ Keep AWS credentials accessible via standard environment variables (for example 
 
 ---
 
+## Riot Developer Key Constraints
+
+- Statistics surfaces only the latest 50 ranked matches to respect Riot's per-method quotas.
+- AI analysis fetches 5 match detail payloads and 5 corresponding timelines per request.
+- Outputs are cached to S3 so repeat visits can reuse the data without additional Riot calls.
+- These limits keep the experience stable while operating under the Riot developer key.
+
+---
+
 ## Everyday Commands
 
 ```bash

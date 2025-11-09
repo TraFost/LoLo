@@ -35,7 +35,7 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
   const {
     baseURL,
     timeoutMs = 10000,
-    retries = 3,
+    retries = 0,
     defaultHeaders = {},
     userAgent = 'LoLo-Client/1.0',
     onLog,
@@ -75,7 +75,7 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
     async (error: AxiosError<{ message?: string }>) => {
       const cfg = (error.config ?? {}) as AxiosRequestConfig & { __retryCount?: number };
       const status = error.response?.status;
-      const shouldRetry = status === 429 || (status !== undefined && status >= 500);
+      const shouldRetry = status !== undefined && status >= 500;
 
       cfg.__retryCount = cfg.__retryCount ?? 0;
 

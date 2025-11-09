@@ -74,7 +74,6 @@ function RoleDistributionSection({ roleDistribution }: RoleDistributionProps) {
 function LoLoAnalysis({ analyzeData, analyzeState }: AnalyzeProps) {
   const { analysis } = analyzeData?.analyze ?? {};
   const { error, isError, isLoading } = analyzeState ?? {};
-  console.log(isError);
 
   return (
     <div className="w-full flex-shrink-0 max-w-md">
@@ -166,7 +165,7 @@ function PracticePlan({ analyzeData, analyzeState }: AnalyzeProps) {
   const { practicePlan } = analyzeData?.analyze ?? {};
 
   const { error, isError, isLoading } = analyzeState ?? {};
-  console.log(isError);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

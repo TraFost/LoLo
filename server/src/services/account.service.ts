@@ -11,6 +11,7 @@ import type { HttpInstance } from 'shared/src/lib/axios';
 import { getLatestVersion } from '../lib/utils/ddragon.util';
 import { createRegionalClient, createPlatformClient } from '../lib/utils/riot.util';
 import { getJSONFromS3, isS3Enabled, putObject } from '../lib/utils/s3.util';
+import { riotRateGate, withRiotRateGate } from '../lib/utils/rate-limiter.util';
 
 export interface AccountSnapshot {
   fetchedAt: string;
@@ -26,6 +27,7 @@ export class AccountService {
   private regionalClient: HttpInstance;
   private platformClient: HttpInstance;
   private readonly region: PlatformRegion;
+  private gate = riotRateGate;
 
   constructor(platformRegion: PlatformRegion) {
     this.region = platformRegion;
@@ -38,7 +40,7 @@ export class AccountService {
     const url = `/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
       gameName,
     )}/${encodeURIComponent(tagLine)}`;
-    const res = await this.regionalClient.get<AccountDTO>(url);
+    const res = await withRiotRateGate(() => this.regionalClient.get<AccountDTO>(url), this.gate);
     return res.data;
   }
 
@@ -51,7 +53,7 @@ export class AccountService {
   async getSummonerByPuuid(puuid: string): Promise<SummonerDTO> {
     const url = `/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(puuid)}`;
 
-    const res = await this.platformClient.get<SummonerDTO>(url);
+    const res = await withRiotRateGate(() => this.platformClient.get<SummonerDTO>(url), this.gate);
     return res.data;
   }
 
@@ -66,7 +68,10 @@ export class AccountService {
 
   async getLeagueEntries(summonerPuuid: string): Promise<LeagueEntryDTO[]> {
     const url = `/lol/league/v4/entries/by-puuid/${encodeURIComponent(summonerPuuid)}`;
-    const res = await this.platformClient.get<LeagueEntryDTO[]>(url);
+    const res = await withRiotRateGate(
+      () => this.platformClient.get<LeagueEntryDTO[]>(url),
+      this.gate,
+    );
     return Array.isArray(res.data) ? res.data : [];
   }
 

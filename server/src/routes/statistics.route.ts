@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
 import { StatusCodes } from 'shared/src/http-status';
@@ -12,10 +11,14 @@ import { zValidator } from '../middlewares/validator.middleware';
 import { successWithData } from '../lib/utils/response.util';
 import { getJSONFromS3, isS3Enabled, putObject } from '../lib/utils/s3.util';
 import { handleRiotError } from '../lib/utils/riot-error.util';
+import { createRouteRateLimiter } from '../configs/rate-limiter.config';
 
 type StatisticsPayload = Awaited<ReturnType<StatisticsService['getStatistics']>>;
 
 const app = new Hono();
+
+const statsRateLimiter = createRouteRateLimiter(5);
+app.use('*', statsRateLimiter);
 
 app.get(
   '/:puuid',

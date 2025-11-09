@@ -22,7 +22,6 @@ export function SummarizePage() {
     isError,
     isLoading,
     isMissingParams,
-    isFetched,
     accountData,
     isAccountError,
     isAccountLoading,
@@ -42,13 +41,13 @@ export function SummarizePage() {
   const champions = fillChampions(statistics?.champions ?? [], 5);
 
   useEffect(() => {
-    if (accountData && isFetched && region) {
+    if (statistics && accountData && region) {
       mutate({
         puuid: accountData.puuid,
         region: region,
       });
     }
-  }, [isFetched, accountData?.puuid, region]);
+  }, [statistics, accountData, region]);
 
   const analyzeState = {
     isLoading: isAnalyzeLoading,
