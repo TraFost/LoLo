@@ -32,10 +32,11 @@ export function Features() {
     <motion.section
       variants={featuresContainer}
       viewport={{ once: true, amount: 0.25 }}
-      className="bg-gray-950 py-14"
+      className="bg-gray-950 py-14 scroll-mt-24"
       aria-label="LoLo Features"
       initial="hidden"
       whileInView="visible"
+      id="features"
     >
       <div className="max-w-7xl mx-auto px-4 gap-16 justify-between md:px-8 lg:flex">
         <motion.div variants={fadeInUp}>
@@ -69,7 +70,7 @@ export function Features() {
           className="mt-12 lg:mt-0 w-full lg:max-w-xl flex items-center"
         >
           <div className="w-full max-w-[720px] lg:min-w-[650px]">
-            <YouTubePlayer videoId="dQw4w9WgXcQ" expandButtonClassName="text-white" />
+            <YouTubePlayer videoId="_ZKpJWflbfs" expandButtonClassName="text-white" />
           </div>
         </motion.div>
       </div>

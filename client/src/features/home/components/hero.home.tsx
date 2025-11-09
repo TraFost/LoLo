@@ -61,15 +61,17 @@ export function Hero() {
               whileHover={!reduce ? { y: -4, scale: 1.02 } : undefined}
               whileTap={!reduce ? { scale: 0.98 } : undefined}
             >
-              <Button
-                variant="flat"
-                color="accent"
-                size="lg"
-                className="w-full sm:w-auto"
-                aria-label="See how LoLo works"
-              >
-                See How It Works
-              </Button>
+              <a href="#features">
+                <Button
+                  variant="flat"
+                  color="accent"
+                  size="lg"
+                  className="w-full sm:w-auto"
+                  aria-label="See how LoLo works"
+                >
+                  See How It Works
+                </Button>
+              </a>
             </motion.div>
           </motion.div>
         </motion.div>
