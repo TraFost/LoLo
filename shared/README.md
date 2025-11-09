@@ -32,7 +32,7 @@ Turbo ensures downstream packages (client, server) rebuild when `shared` emits a
 - Update the shared types **before** consuming new fields in the client or server.
 - Export factory helpers for complex objects to keep DTO creation consistent.
 - Coordinate version bumps by running `pnpm install` at the repo root so lockfiles stay in sync.
-- When documenting a new contract, drop a quick example payload or `(screenshot)` of the UI that will consume it.
+- When documenting a new contract, include a concise example payload and note which UI surfaces consume it.
 
 ---
 

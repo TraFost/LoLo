@@ -1,6 +1,6 @@
 # LoLo – Your Reflective League Coach
 
-LoLo turns raw match logs into an actionable post-game huddle. It stitches together Riot Games telemetry, AWS Bedrock reasoning, and a React-powered experience so players can understand the _why_ behind their performance instead of just staring at spreadsheets. Use this guide to spin up the full stack, explore the major workflows, and learn how each package fits together. Add visual callouts wherever you see `(screenshot)`.
+LoLo turns raw match logs into an actionable post-game huddle. It stitches together Riot Games telemetry, AWS Bedrock reasoning, and a React-powered experience so players can understand the _why_ behind their performance instead of just staring at spreadsheets. Use this guide to spin up the full stack, explore the major workflows, and learn how each package fits together.
 
 ---
 
@@ -8,8 +8,8 @@ LoLo turns raw match logs into an actionable post-game huddle. It stitches toget
 
 - Personalized recaps highlight momentum, slump warnings, and habits worth reinforcing.
 - AI-authored improvement plans adapt to your champion pool and recent trends.
-- Shareable cards let you flex highlights on socials without leaving the dashboard `(screenshot)`.
-- Coach-mode router keeps navigation calm and focused, even when juggling dozens of matches `(screenshot)`.
+- Shareable cards let you flex highlights on socials without leaving the dashboard.
+- Coach-mode router keeps navigation calm and focused, even when juggling dozens of matches.
 
 ---
 
@@ -108,8 +108,8 @@ pnpm run deploy
 1. Launch the dev stack with `pnpm run dev`.
 2. Visit `http://localhost:5173`.
 3. Search for a Riot ID that has match history.
-4. Open the Analyze tab to generate strengths and focus areas `(screenshot)`.
-5. Export a recap card and confirm the PNG downloads `(screenshot)`.
+4. Open the Analyze tab to generate strengths and focus areas.
+5. Export a recap card and confirm the PNG downloads.
 
 ---
 

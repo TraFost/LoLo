@@ -76,7 +76,7 @@ All routes are validated with the schemas in `src/schemas/` and use service modu
 
 - `logger.middleware.ts` wraps incoming requests with structured logs.
 - Add domain-level breadcrumbs inside services to trace Riot + Bedrock interactions.
-- Use `(screenshot)` placeholders when documenting new dashboard or API observability panels.
+- Describe new dashboard or API observability panels directly in the documentation.
 
 ---
 
