@@ -47,7 +47,7 @@ interface PlayerComparisonProps extends CardProps {
 export function ImageCardSection({ children }: Props) {
   return (
     <section className="w-full px-4 flex flex-col lg:flex-row items-center justify-center font-bold mt-24 lg:-mt-48">
-      <div className="text-center -mb-96 md:-mb-64 lg:-mb-0 z-50 px-2 lg:order-2 lg:max-w-1/4 lg:w-full">
+      <div className="text-center -mb-96 md:-mb-64 lg:-mb-0 z-40 px-2 lg:order-2 lg:max-w-1/4 lg:w-full">
         <p className="text-5xl 2xl:text-6xl font-bold">Share your achievements</p>
         <p className="text-lg font-light text-gray-300 text-center mt-2 mb-8">
           Let everyone see your top champions and proudest moments

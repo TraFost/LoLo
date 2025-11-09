@@ -11,8 +11,12 @@ import { zValidator } from '../middlewares/validator.middleware';
 import { improvementRequestSchema } from '../schemas/analyze.schema';
 import { successWithData } from '../lib/utils/response.util';
 import { handleRiotError } from '../lib/utils/riot-error.util';
+import { createRouteRateLimiter } from '../configs/rate-limiter.config';
 
 const app = new Hono();
+
+const analyzeRateLimiter = createRouteRateLimiter(5);
+app.use('*', analyzeRateLimiter);
 
 app.post('/improvement', zValidator('json', improvementRequestSchema), async (c) => {
   try {

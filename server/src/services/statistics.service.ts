@@ -10,15 +10,16 @@ import type {
 } from 'shared/src/types/statistics.type';
 import type { PlatformRegion } from 'shared/src/types/account.type';
 
-import { HeaderRateGate } from '../lib/utils/rate-limiter.util';
+import { riotRateGate, withRiotRateGate } from '../lib/utils/rate-limiter.util';
 import { createPlatformClient, createRegionalClient } from '../lib/utils/riot.util';
-import { MONTHS } from 'shared/src/constants/match.constant';
+import { MONTHS, RANKED_MATCH } from 'shared/src/constants/match.constant';
 
 export class StatisticsService {
   private regionalClient;
   private platformClient;
-  private gate = new HeaderRateGate();
-  private concurrency = 12;
+  private gate = riotRateGate;
+  private concurrency = 3;
+  private MAX_MATCHES = 50;
 
   constructor(platformRegion: PlatformRegion) {
     const region = platformRegion;
@@ -36,21 +37,21 @@ export class StatisticsService {
     const matches = await this.getMatchDetails(matchIds);
 
     const times = matches.map((m) => m.info.gameCreation).sort((a, b) => a - b);
-    console.log('[stats] first/last game', {
-      first: times[0] ? new Date(times[0]).toISOString() : null,
-      last: times.at(-1) ? new Date(times.at(-1)!).toISOString() : null,
-    });
+    // console.log('[stats] first/last game', {
+    //   first: times[0] ? new Date(times[0]).toISOString() : null,
+    //   last: times.at(-1) ? new Date(times.at(-1)!).toISOString() : null,
+    // });
 
     const byQueue = new Map<number, number>();
     for (const m of matches) byQueue.set(m.info.queueId, (byQueue.get(m.info.queueId) || 0) + 1);
-    console.log('[stats] byQueue', Object.fromEntries(byQueue));
+    // console.log('[stats] byQueue', Object.fromEntries(byQueue));
 
-    console.log(
-      '[stats] ids=%d fetched=%d dropped=%d',
-      matchIds.length,
-      matches.length,
-      matchIds.length - matches.length,
-    );
+    // console.log(
+    //   '[stats] ids=%d fetched=%d dropped=%d',
+    //   matchIds.length,
+    //   matches.length,
+    //   matchIds.length - matches.length,
+    // );
 
     const playerMatches = this.filterPlayerMatches(matches, puuid);
 
@@ -70,7 +71,7 @@ export class StatisticsService {
     const url = `/lol/champion-mastery/v4/champion-masteries/by-puuid/${encodeURIComponent(puuid)}`;
 
     try {
-      const res = await this.platformClient.get(url);
+      const res = await withRiotRateGate(() => this.platformClient.get<any[]>(url), this.gate);
       const map = new Map<number, any>();
       for (const m of res.data as any[]) {
         map.set(m.championId, {
@@ -101,12 +102,13 @@ export class StatisticsService {
         count: String(pageSize),
         startTime: String(startOfYearSec),
         endTime: String(nowSec),
-        queue: '420',
+        queue: RANKED_MATCH,
       });
 
-      await this.gate.before();
-      const res = await this.regionalClient.get<string[]>(`${url}?${params.toString()}`);
-      await this.gate.after(res.headers as any);
+      const res = await withRiotRateGate(
+        () => this.regionalClient.get<string[]>(`${url}?${params.toString()}`),
+        this.gate,
+      );
 
       const page = res.data ?? [];
       all.push(...page);
@@ -114,13 +116,13 @@ export class StatisticsService {
       start += pageSize;
     }
 
-    console.log('[stats] year window', {
-      startISO: new Date(startOfYearSec * 1000).toISOString(),
-      endISO: new Date(nowSec * 1000).toISOString(),
-      ids: all.length,
-    });
+    // console.log('[stats] year window', {
+    //   startISO: new Date(startOfYearSec * 1000).toISOString(),
+    //   endISO: new Date(nowSec * 1000).toISOString(),
+    //   ids: all.length,
+    // });
 
-    return all.slice(0, 120);
+    return all.slice(0, this.MAX_MATCHES);
   }
 
   private async getMatchDetails(matchIds: string[]): Promise<MatchDTO[]> {
@@ -145,9 +147,9 @@ export class StatisticsService {
     await Promise.all(workers);
 
     if (dropped > matchIds.length * 0.3) {
-      console.log(`[stats] high drop (${dropped}), retrying half speed`);
+      // console.log(`[stats] high drop (${dropped}), retrying half speed`);
 
-      this.concurrency = Math.max(6, Math.floor(this.concurrency / 2));
+      this.concurrency = Math.max(2, Math.floor(this.concurrency / 2) || 1);
       const missing = matchIds.filter((id) => !out.find((m) => m.metadata?.matchId === id));
       const retry: MatchDTO[] = [];
       let j = 0;
@@ -173,9 +175,7 @@ export class StatisticsService {
 
     for (let attempt = 0; attempt < 6; attempt++) {
       try {
-        await this.gate.before();
-        const res = await this.regionalClient.get<MatchDTO>(url);
-        await this.gate.after(res.headers as any);
+        const res = await withRiotRateGate(() => this.regionalClient.get<MatchDTO>(url), this.gate);
         return res.data;
       } catch (e: any) {
         const status = e?.response?.status ?? e?.status ?? 0;

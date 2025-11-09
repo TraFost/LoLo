@@ -1,3 +1,5 @@
+import type { AxiosResponse } from 'axios';
+
 import { sleep } from 'shared/src/lib/utils';
 
 export class HeaderRateGate {
@@ -64,5 +66,25 @@ export class HeaderRateGate {
     const raVal = headers?.['retry-after'];
     const raStr = typeof raVal === 'string' ? raVal : String(raVal ?? '');
     if (raStr) await sleep(Number(raStr) ? Number(raStr) * 1000 : 500);
+  }
+}
+
+export const riotRateGate = new HeaderRateGate();
+
+export async function withRiotRateGate<T>(
+  request: () => Promise<AxiosResponse<T>>,
+  gate: HeaderRateGate = riotRateGate,
+): Promise<AxiosResponse<T>> {
+  await gate.before();
+  try {
+    const response = await request();
+    await gate.after(response.headers as Record<string, unknown>);
+    return response;
+  } catch (error: any) {
+    const headers = error?.response?.headers as Record<string, unknown> | undefined;
+    if (headers) {
+      await gate.after(headers);
+    }
+    throw error;
   }
 }

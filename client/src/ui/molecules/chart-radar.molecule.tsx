@@ -67,7 +67,7 @@ export default function ChartRadar({ data, playerName, proPlayerName }: Props) {
           </RadarChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex gap-6 items-center text-white">
+      <div className="flex gap-6 items-center text-white z-50">
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <input
             type="checkbox"
