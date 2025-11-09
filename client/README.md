@@ -6,7 +6,7 @@ This Vite + React 19 workspace renders the LoLo coaching experience. It turns Ri
 
 ## Feature Highlights
 
-- Guided Riot ID lookup with region picker and input validation overlays `(screenshot)`.
+- Guided Riot ID lookup with region picker and input validation overlays.
 - Analyze flow with collapsible cards, practice-plan accordions, and export-ready recap banners.
 - TanStack Query caching with persistence for offline refresh resilience.
 - Tailwind CSS v4 + utility-first atoms/molecules for consistent theming.
@@ -76,9 +76,9 @@ When using `turbo dev --filter=client`, Turbo will watch shared packages automat
 
 ---
 
-## UX Writing & Screenshots
+## UX Writing Notes
 
-When you add a new screen, capture a walkthrough `(screenshot)` and document the intent inside the feature folder README or `internal-docs/`. The coaching voice should stay calm, encouraging, and actionable.
+When you add a new screen, document the walkthrough inside the feature folder README or `internal-docs/`. The coaching voice should stay calm, encouraging, and actionable.
 
 ---
 
