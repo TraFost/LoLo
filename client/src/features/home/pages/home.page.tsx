@@ -14,8 +14,8 @@ export function HomePage() {
       <Hero />
       <SocialProofBar />
       <Features />
-      <FAQ />
       <CTASection />
+      <FAQ />
       <Footer />
     </>
   );
