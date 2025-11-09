@@ -12,7 +12,7 @@ import {
 import { useFetchStatistics } from '../hooks/statistics/use-fetch-statistics.hook';
 import { fillChampions } from '../utils/champion/fill-champions.util';
 import { RenderState } from '../components/render-state.summarize';
-import { usePostAnalyze } from '../hooks/analyze/use-post-analyze.hook';
+import { useAnalyzeMutation } from '../hooks/analyze/use-analyze-mutation.hook';
 import { useEffect } from 'react';
 
 export function SummarizePage() {
@@ -22,22 +22,39 @@ export function SummarizePage() {
     isError,
     isLoading,
     isMissingParams,
+    isFetched,
     accountData,
     isAccountError,
     isAccountLoading,
     accountError,
     region,
+    progress,
   } = useFetchStatistics();
 
-  const { mutate, data: analyzeData } = usePostAnalyze();
+  const {
+    mutate,
+    data: analyzeData,
+    isLoading: isAnalyzeLoading,
+    isError: isAnalyzeError,
+    error: analyzeError,
+  } = useAnalyzeMutation();
 
   const champions = fillChampions(statistics?.champions ?? [], 5);
 
   useEffect(() => {
-    if (accountData && statistics && region) {
-      mutate();
+    if (accountData && isFetched && region) {
+      mutate({
+        puuid: accountData.puuid,
+        region: region,
+      });
     }
-  }, [accountData, statistics, region]);
+  }, [isFetched, accountData?.puuid, region]);
+
+  const analyzeState = {
+    isLoading: isAnalyzeLoading,
+    isError: isAnalyzeError,
+    error: analyzeError,
+  };
 
   return (
     <RenderState
@@ -45,11 +62,8 @@ export function SummarizePage() {
       isAccountLoading={isAccountLoading}
       isLoading={isLoading}
       isError={isAccountError || isError}
-      error={
-        typeof accountError === 'object'
-          ? accountError?.message
-          : accountError || (typeof error === 'object' ? error?.message : error)
-      }
+      progress={progress}
+      error={accountError?.message || error?.message}
     >
       {accountData && statistics && region ? (
         <div className="flex flex-col items-center bg-gray-950 text-white">
@@ -65,10 +79,14 @@ export function SummarizePage() {
           <ChampionsSummarize champions={champions} />
           <GameplayOverview
             gameplayData={statistics.gameplay}
-            puuid={accountData.puuid}
-            region={region}
+            analyzeData={analyzeData}
+            analyzeState={analyzeState}
           />
-          <ProPlayer playerName={accountData.gameName} puuid={accountData.puuid} region={region} />
+          <ProPlayer
+            playerName={accountData.gameName}
+            analyzeData={analyzeData}
+            analyzeState={analyzeState}
+          />
           {analyzeData && (
             <ImageCardSection>
               <MostPlayedChampionsCard
