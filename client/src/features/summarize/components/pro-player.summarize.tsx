@@ -4,23 +4,15 @@ import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 import ChartRadar from '@/ui/molecules/chart-radar.molecule';
 
 import { PLAYER_IMAGES } from '@/core/constants/player.constant';
-import { useQuery } from '@tanstack/react-query';
-import { AnalyzeResponse } from '@/types/analyze';
+import { AnalyzeProps } from '@/types/analyze';
 
-interface Props {
+interface Props extends AnalyzeProps {
   playerName: string;
-  puuid: string;
-  region: string;
 }
 
-export function ProPlayer({ playerName, puuid, region }: Props) {
-  const { data, error, isError, isPending } = useQuery<AnalyzeResponse>({
-    queryKey: ['analyze', puuid, region],
-    queryFn: () => Promise.reject('disabled'),
-    enabled: false,
-  });
-
-  const { comparison } = data ?? {};
+export function ProPlayer({ playerName, analyzeData, analyzeState }: Props) {
+  const { comparison } = analyzeData ?? {};
+  const { error, isError, isLoading } = analyzeState ?? {};
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden mt-24 grid grid-cols-1 lg:grid-cols-2">
@@ -35,7 +27,7 @@ export function ProPlayer({ playerName, puuid, region }: Props) {
         transition={{ duration: 0.3, ease: 'linear' }}
         className="flex flex-col justify-center items-center p-6 lg:pr-12"
       >
-        {isPending && (
+        {isLoading && (
           <motion.div
             key="loading"
             initial={{ opacity: 0, y: 20 }}
@@ -97,7 +89,7 @@ export function ProPlayer({ playerName, puuid, region }: Props) {
             className="flex flex-col gap-4 text-blue-400 items-center"
           >
             <p className="text-red-400 font-semibold text-lg">Something went wrong</p>
-            <p className="text-slate-400 text-sm max-w-md">{error.message}</p>
+            <p className="text-slate-400 text-sm max-w-md">{error?.message}</p>
           </motion.div>
         )}
 
@@ -147,7 +139,7 @@ export function ProPlayer({ playerName, puuid, region }: Props) {
 
       {/* RIGHT - Comparison / Loading / Reveal */}
       <div className="relative flex flex-col items-center justify-start lg:justify-center p-6 lg:pl-12 text-center lg:text-left">
-        {isPending && (
+        {isLoading && (
           <motion.div
             key="pro-player-loading"
             initial={{ opacity: 0, y: 10 }}
@@ -206,7 +198,7 @@ export function ProPlayer({ playerName, puuid, region }: Props) {
             className="flex flex-col gap-4 text-blue-400 items-center"
           >
             <p className="text-red-400 font-semibold text-lg">Something went wrong</p>
-            <p className="text-slate-400 text-sm max-w-md">{error.message}</p>
+            <p className="text-slate-400 text-sm max-w-md">{error?.message}</p>
           </motion.div>
         )}
 

@@ -17,11 +17,20 @@ const loadingMessages = [
 interface LoadingSectionProps {
   isLoading?: boolean;
   showProgressBar?: boolean;
+  progressValue?: number;
 }
 
-export function LoadingSection({ isLoading = true, showProgressBar = false }: LoadingSectionProps) {
+export function LoadingSection({
+  isLoading = true,
+  showProgressBar = false,
+  progressValue,
+}: LoadingSectionProps) {
   const [messageIndex, setMessageIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (typeof progressValue === 'number') setProgress(progressValue);
+  }, [progressValue]);
 
   useEffect(() => {
     const messageInterval = setInterval(() => {

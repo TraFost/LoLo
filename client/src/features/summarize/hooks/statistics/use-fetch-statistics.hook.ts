@@ -2,22 +2,31 @@ import { useQuery } from '@tanstack/react-query';
 import type { ResponseWithData } from 'shared/src/types/response';
 import type { StatisticsResponse } from 'shared/src/types/statistics.type';
 import { useFetchAccount } from '../account/use-fetch-account.hook';
-import { apiClient } from '@/lib/utils/api-client';
+import { fetchWithProgress } from '@/lib/utils/api/api-client.util';
+import { useState } from 'react';
+import { getErrorMessage } from '@/lib/utils/error/error-message';
 
-const fetchStatistics = async (puuid: string, region: string): Promise<StatisticsResponse> => {
-  const res = await apiClient.get<ResponseWithData<StatisticsResponse>>(`/statistics/${puuid}`, {
-    params: { region },
-  });
-  const response = res.data;
+const fetchStatistics = async (
+  puuid: string,
+  region: string,
+  onProgress?: (p: number) => void,
+): Promise<StatisticsResponse> => {
+  try {
+    const res = await fetchWithProgress<ResponseWithData<StatisticsResponse>>(
+      `/statistics/${puuid}`,
+      { params: { region }, onProgress },
+    );
 
-  if (!response.success) {
-    throw new Error(response.message || 'API call was not successful');
+    if (!res.success) throw new Error(res.message || 'API call was not successful');
+    return res.data;
+  } catch (error: unknown) {
+    throw new Error(getErrorMessage(error));
   }
-
-  return response.data;
 };
 
 export function useFetchStatistics() {
+  const [progress, setProgress] = useState(0);
+
   const {
     data: accountData,
     isLoading: isAccountLoading,
@@ -31,7 +40,7 @@ export function useFetchStatistics() {
 
   const statisticsQuery = useQuery({
     queryKey: ['statistics', puuid, region],
-    queryFn: () => fetchStatistics(puuid!, region!),
+    queryFn: () => fetchStatistics(puuid!, region!, setProgress),
     enabled: !!puuid && !isAccountLoading && !isMissingParams,
     retry: 1,
     refetchOnWindowFocus: false,
@@ -46,5 +55,6 @@ export function useFetchStatistics() {
     accountError,
     isMissingParams,
     region,
+    progress,
   };
 }

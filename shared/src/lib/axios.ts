@@ -42,16 +42,21 @@ export function createHttpClient(opts: CreateClientOpts): AxiosInstance {
     isClient = false,
   } = opts;
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    ...defaultHeaders,
+  };
+
+  if (!isClient) {
+    headers['User-Agent'] = userAgent;
+  }
+
   const instance = axios.create({
     baseURL,
     timeout: timeoutMs,
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'User-Agent': userAgent,
-      ...defaultHeaders,
-    },
-    ...(isClient ? {} : { httpAgent, httpsAgent }), // skip agent kalau di browser
+    headers,
+    ...(isClient ? {} : { httpAgent, httpsAgent }),
     paramsSerializer: { serialize: (params) => qs.stringify(params, { arrayFormat: 'repeat' }) },
     validateStatus: (s) => s >= 200 && s < 300,
     decompress: true,

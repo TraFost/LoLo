@@ -52,8 +52,11 @@ export function YouTubePlayer({
   playerClassName,
 }: YouTubePlayerProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const [playing, setPlaying] = useState(false);
+  const [activeView, setActiveView] = useState<'inline' | 'expanded' | null>(null);
   const [isHovered] = useState(false);
+  const isPlaying = activeView !== null;
+  const isInlineActive = activeView === 'inline';
+  const isExpandedActive = activeView === 'expanded';
 
   const extractVideoId = (id: string) => {
     if (id.includes('youtube.com') || id.includes('youtu.be')) {
@@ -74,8 +77,8 @@ export function YouTubePlayer({
 
   const actualVideoId = extractVideoId(videoId);
 
-  const handlePlay = () => {
-    setPlaying(true);
+  const handlePlay = (view: Exclude<typeof activeView, null>) => {
+    setActiveView(view);
   };
 
   const toggleExpand = () => {
@@ -94,6 +97,19 @@ export function YouTubePlayer({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
+  }, [expanded]);
+
+  useEffect(() => {
+    setActiveView((current) => {
+      if (!current) return current;
+      if (expanded && current === 'inline') {
+        return 'expanded';
+      }
+      if (!expanded && current === 'expanded') {
+        return null;
+      }
+      return current;
+    });
   }, [expanded]);
 
   const getThumbnailUrl = () => {
@@ -115,7 +131,7 @@ export function YouTubePlayer({
             layoutId={`youtube-player-content-${videoId}`}
             className={cn('relative aspect-video', playerClassName)}
           >
-            {!playing && (
+            {!isInlineActive && (
               <>
                 <motion.div
                   layoutId={`youtube-player-thumbnail-container-${videoId}`}
@@ -150,7 +166,7 @@ export function YouTubePlayer({
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                       playButtonClassName,
                     )}
-                    onClick={handlePlay}
+                    onClick={() => handlePlay('inline')}
                     aria-label="Play video"
                   >
                     <Play
@@ -176,7 +192,7 @@ export function YouTubePlayer({
               </>
             )}
 
-            {playing && (
+            {isInlineActive && (
               <iframe
                 src={`https://www.youtube.com/embed/${actualVideoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&controls=1`}
                 title={title}
@@ -189,7 +205,7 @@ export function YouTubePlayer({
             <YouTubePlayerControls
               videoId={videoId}
               expanded={expanded}
-              playing={playing}
+              playing={isPlaying}
               isHovered={isHovered}
               onToggleExpand={toggleExpand}
               controlsClassName={controlsClassName}
@@ -228,7 +244,7 @@ export function YouTubePlayer({
                   layoutId={`youtube-player-content-${videoId}`}
                   className={cn('relative aspect-video bg-muted', playerClassName)}
                 >
-                  {!playing && (
+                  {!isExpandedActive && (
                     <>
                       <motion.div
                         layoutId={`youtube-player-thumbnail-container-${videoId}`}
@@ -263,7 +279,7 @@ export function YouTubePlayer({
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                             playButtonClassName,
                           )}
-                          onClick={handlePlay}
+                          onClick={() => handlePlay('expanded')}
                           aria-label="Play video"
                         >
                           <Play
@@ -289,7 +305,7 @@ export function YouTubePlayer({
                     </>
                   )}
 
-                  {playing && (
+                  {isExpandedActive && (
                     <iframe
                       src={`https://www.youtube.com/embed/${actualVideoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&controls=1`}
                       title={title}
@@ -302,7 +318,7 @@ export function YouTubePlayer({
                   <YouTubePlayerControls
                     videoId={videoId}
                     expanded={expanded}
-                    playing={playing}
+                    playing={isPlaying}
                     isHovered={isHovered}
                     onToggleExpand={toggleExpand}
                     controlsClassName={controlsClassName}

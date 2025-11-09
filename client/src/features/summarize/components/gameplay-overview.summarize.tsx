@@ -6,20 +6,17 @@ import { ChevronUp } from 'lucide-react';
 import { GameplayData, RoleDistribution } from 'shared/src/types/statistics.type';
 import LoloIcon from '@/ui/molecules/lolo-icon.molecule';
 import { motion } from 'motion/react';
-import { useQuery } from '@tanstack/react-query';
-import { AnalyzeResponse } from '@/types/analyze';
+import { AnalyzeProps } from '@/types/analyze';
 
 interface RoleDistributionProps {
   roleDistribution: RoleDistribution[];
 }
 
-interface Props {
+interface Props extends AnalyzeProps {
   gameplayData: GameplayData;
-  puuid: string;
-  region: string;
 }
 
-export function GameplayOverview({ gameplayData, puuid, region }: Props) {
+export function GameplayOverview({ gameplayData, analyzeData, analyzeState }: Props) {
   const { chartStatistics, roleDistribution } = gameplayData;
 
   return (
@@ -41,10 +38,10 @@ export function GameplayOverview({ gameplayData, puuid, region }: Props) {
           </div>
 
           {/* LoLo Analysis Section */}
-          <LoLoAnalysis puuid={puuid} region={region} />
+          <LoLoAnalysis analyzeData={analyzeData} analyzeState={analyzeState} />
         </div>
         <div>
-          <PracticePlan puuid={puuid} region={region} />
+          <PracticePlan analyzeData={analyzeData} analyzeState={analyzeState} />
         </div>
       </div>
     </section>
@@ -74,15 +71,10 @@ function RoleDistributionSection({ roleDistribution }: RoleDistributionProps) {
   );
 }
 
-function LoLoAnalysis({ puuid, region }: { puuid: string; region: string }) {
-  const { data, error, isError, isPending } = useQuery<AnalyzeResponse>({
-    queryKey: ['analyze', puuid, region],
-    queryFn: () => Promise.reject('disabled'),
-    enabled: false,
-  });
-
-  const { analysis } = data?.analyze ?? {};
-  console.log(data);
+function LoLoAnalysis({ analyzeData, analyzeState }: AnalyzeProps) {
+  const { analysis } = analyzeData?.analyze ?? {};
+  const { error, isError, isLoading } = analyzeState ?? {};
+  console.log(isError);
 
   return (
     <div className="w-full flex-shrink-0 max-w-md">
@@ -90,7 +82,7 @@ function LoLoAnalysis({ puuid, region }: { puuid: string; region: string }) {
         LoLo Analysis
       </h3>
       <div className="lg:max-h-[calc(100vh-6rem)] max-w-md w-full overflow-y-auto space-y-4 bg-gray-900 p-6 border border-gray-700">
-        {isPending && (
+        {isLoading && (
           <div className="flex flex-col items-center justify-center gap-6 py-24 text-center">
             <div className="w-24">
               <LoloIcon animation="spin" />
@@ -127,7 +119,7 @@ function LoLoAnalysis({ puuid, region }: { puuid: string; region: string }) {
             className="flex flex-col items-center justify-center gap-2 py-20 text-center"
           >
             <p className="text-red-400 font-semibold text-lg">Something went wrong</p>
-            <p className="text-slate-400 text-sm max-w-md">{error.message}</p>
+            <p className="text-slate-400 text-sm max-w-md">{error?.message}</p>
           </motion.div>
         )}
 
@@ -170,15 +162,11 @@ function LoLoAnalysis({ puuid, region }: { puuid: string; region: string }) {
   );
 }
 
-function PracticePlan({ puuid, region }: { puuid: string; region: string }) {
-  const { data, error, isError, isPending } = useQuery<AnalyzeResponse>({
-    queryKey: ['analyze', puuid, region],
-    queryFn: () => Promise.reject('disabled'),
-    enabled: false,
-  });
+function PracticePlan({ analyzeData, analyzeState }: AnalyzeProps) {
+  const { practicePlan } = analyzeData?.analyze ?? {};
 
-  const { practicePlan } = data?.analyze ?? {};
-
+  const { error, isError, isLoading } = analyzeState ?? {};
+  console.log(isError);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -187,7 +175,7 @@ function PracticePlan({ puuid, region }: { puuid: string; region: string }) {
       viewport={{ once: true }}
       className="w-full max-w-6xl mx-auto bg-gray-900 border border-gray-700 p-12 space-y-12"
     >
-      {isPending && (
+      {isLoading && (
         <div className="text-center space-y-2">
           <h3 className="text-4xl font-bold text-white tracking-wide">Practice Plan</h3>
           <p className="text-gray-400 text-base">Loading</p>
@@ -197,7 +185,7 @@ function PracticePlan({ puuid, region }: { puuid: string; region: string }) {
       {isError && (
         <div className="text-center space-y-2">
           <h3 className="text-4xl font-bold text-white tracking-wide">Practice Plan</h3>
-          <p className="text-gray-400 text-base">{error.message}</p>
+          <p className="text-gray-400 text-base">{error?.message}</p>
         </div>
       )}
       {practicePlan && (

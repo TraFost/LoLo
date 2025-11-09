@@ -1,3 +1,4 @@
+import { CTASection } from '../components/cta.home';
 import { FAQ } from '../components/faq.home';
 import { Features } from '../components/features.home';
 import { Footer } from '../components/footer.home';
@@ -13,8 +14,8 @@ export function HomePage() {
       <Hero />
       <SocialProofBar />
       <Features />
+      <CTASection />
       <FAQ />
-      {/* <CTASection /> */}
       <Footer />
     </>
   );

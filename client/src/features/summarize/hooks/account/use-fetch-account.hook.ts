@@ -1,4 +1,5 @@
-import { apiClient } from '@/lib/utils/api-client';
+import { apiClient } from '@/lib/utils/api/api-client.util';
+import { getErrorMessage } from '@/lib/utils/error/error-message';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
@@ -20,21 +21,24 @@ export const fetchAccount = async ({
   tagName: string;
   region: string;
 }): Promise<AccountDTOResponse> => {
-  const res = await apiClient.get<ResponseWithData<AccountDTOResponse>>(
-    `/account/${gameName}/${tagName}`,
-    {
-      params: {
-        region,
+  try {
+    const res = await apiClient.get<ResponseWithData<AccountDTOResponse>>(
+      `/account/${gameName}/${tagName}`,
+      {
+        params: {
+          region,
+        },
       },
-    },
-  );
-  console.log(res);
-  const response = res.data;
+    );
+    const response = res.data;
 
-  if (!response.success) {
-    throw new Error(response.message || 'API call was not successful');
+    if (!response.success) {
+      throw new Error(response.message || 'API call was not successful');
+    }
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
   }
-  return response.data;
 };
 
 export function useFetchAccount() {
